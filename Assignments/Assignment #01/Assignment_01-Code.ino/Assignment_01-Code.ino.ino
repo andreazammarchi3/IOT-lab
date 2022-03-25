@@ -13,30 +13,67 @@
 #define L3 5
 #define L4 3
 
-int s = 0;
+int Leds[] = {L1, L2, L3, L4};
+
+int sleepCounter = 0;
+int sleepCountdown = 10000; /* 10000 msec = 10 sec */
+int fadingSpeed = 20;
+int brightness = 0;
+int fadeAmount = 5;
+int score = 0;
+boolean waiting = true;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(T1, INPUT_PULLUP);
+  pinMode(T2, INPUT_PULLUP);
+  pinMode(T3, INPUT_PULLUP);
   pinMode(T4, INPUT_PULLUP);
   pinMode(Ls, OUTPUT);
-  Serial.println("Pronti!");
-
-  digitalWrite(Ls, HIGH);
+  for (int i=0; i<sizeof(Leds); i++) {
+    pinMode(Leds[i], OUTPUT);
+  }
+  initialState();
 }
 
 void loop() {
-  delay(1000);
-  s++;
-
-  if(s == 3) {
-    Serial.println("Sto dormendo...");
-    delay(200);
-    s = 0;
-    startSleep();
+  if(waiting == true) {
+    analogWrite(Ls, brightness);
+    brightness = brightness + fadeAmount;
+    if (brightness <= 0 || brightness >= 255) {
+      fadeAmount = -fadeAmount;
+    }
+  
+    if (sleepCounter == sleepCountdown / fadingSpeed) {
+      Serial.println("I'm sleeping...");
+      sleepCounter = 0;
+      startSleep();
+    }
+  
+    delay(fadingSpeed);
+    sleepCounter++;
+  } else {
+    delay(5000);
+    initialState();
   }
+  
+}
+
+void initialState() {
+  waiting = true;
+  sleepCounter = 0;
+  Serial.println("Welcome to the Catch the Bouncing Led Ball Game. Press Key T1 to Start");
+
+  digitalWrite(Ls, LOW);
+  for (int i=0; i<sizeof(Leds); i++) {
+    digitalWrite(Leds[i], LOW);
+  }
+
+  enableInterrupt(T1, startGame, RISING);
 }
 
 void startSleep() {
+  disableInterrupt(T1);
   enableInterrupt(T1, wakeUp, RISING);
   enableInterrupt(T2, wakeUp, RISING);
   enableInterrupt(T3, wakeUp, RISING);
@@ -56,6 +93,16 @@ void wakeUp() {
   disableInterrupt(T2);
   disableInterrupt(T3);
   disableInterrupt(T4);
-  digitalWrite(Ls, HIGH);
-  Serial.println("Sono sveglio!");
+  initialState();
+}
+
+void startGame() {
+  disableInterrupt(T1);
+  Serial.println("Go!");
+  digitalWrite(Ls, LOW);
+  for (int i=0; i<sizeof(Leds); i++) {
+    digitalWrite(Leds[i], HIGH);
+  }
+  waiting = false;
+  score = 0;
 }
