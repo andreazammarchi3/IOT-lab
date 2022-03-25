@@ -1,4 +1,6 @@
-#define Pot A0
+#include <avr/sleep.h>
+#include <avr/power.h>
+#include "EnableInterrupt.h"
 
 #define T1 8
 #define T2 7
@@ -11,59 +13,49 @@
 #define L3 5
 #define L4 3
 
-int current;
+int s = 0;
 
-void setup()
-{
-  pinMode(Ls, OUTPUT);
-  pinMode(L1, OUTPUT);
-  pinMode(L2, OUTPUT);
-  pinMode(L3, OUTPUT);
-  pinMode(L4, OUTPUT);
-  pinMode(T1, INPUT);
-  pinMode(T2, INPUT);
-  pinMode(T3, INPUT);
-  pinMode(T4, INPUT);
-
+void setup() {
   Serial.begin(9600);
+  pinMode(T4, INPUT_PULLUP);
+  pinMode(Ls, OUTPUT);
+  Serial.println("Pronti!");
+
+  digitalWrite(Ls, HIGH);
 }
 
-void loop()
-{
-  int T1_state = digitalRead(T1);
-  int T2_state = digitalRead(T2);
-  int T3_state = digitalRead(T3);
-  int T4_state = digitalRead(T4);
-  
-  if (T1_state == HIGH) {
-    digitalWrite(L1, HIGH);
-  } else {
-    digitalWrite(L1, LOW);
-  }
+void loop() {
+  delay(1000);
+  s++;
 
-  if (T2_state == HIGH) {
-    digitalWrite(L2, HIGH);
-  } else {
-    digitalWrite(L2, LOW);
+  if(s == 3) {
+    Serial.println("Sto dormendo...");
+    delay(200);
+    s = 0;
+    startSleep();
   }
+}
 
-  if (T3_state == HIGH) {
-    digitalWrite(L3, HIGH);
-  } else {
-    digitalWrite(L3, LOW);
-  }
+void startSleep() {
+  enableInterrupt(T1, wakeUp, RISING);
+  enableInterrupt(T2, wakeUp, RISING);
+  enableInterrupt(T3, wakeUp, RISING);
+  enableInterrupt(T4, wakeUp, RISING);
+  delay(100);
+  digitalWrite(Ls, LOW);
 
-  if (T4_state == HIGH) {
-    digitalWrite(L4, HIGH);
-  } else {
-    digitalWrite(L4, LOW);
-  }
-  
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+  sleep_mode();
+
+  sleep_disable();
+}
+
+void wakeUp() {
+  disableInterrupt(T1);
+  disableInterrupt(T2);
+  disableInterrupt(T3);
+  disableInterrupt(T4);
   digitalWrite(Ls, HIGH);
-
-  int newValue = analogRead(Pot);
-  if (newValue != current) {
-    current = newValue;
-    Serial.println(current);
-  }
+  Serial.println("Sono sveglio!");
 }
