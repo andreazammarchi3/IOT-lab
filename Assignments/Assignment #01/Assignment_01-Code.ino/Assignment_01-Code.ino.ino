@@ -13,7 +13,7 @@
 #define L3 5
 #define L4 3
 
-int Leds[] = {L1, L2, L3, L4};
+char Leds[] = {L1, L2, L3, L4};
 
 int sleepCounter = 0;
 int sleepCountdown = 10000; /* 10000 msec = 10 sec */
@@ -22,6 +22,12 @@ int brightness = 0;
 int fadeAmount = 5;
 int score = 0;
 boolean waiting = true;
+boolean forward = true;
+
+int S = 1000;
+int P = 1;
+int t1;
+int t2;
 
 void setup() {
   Serial.begin(9600);
@@ -37,7 +43,8 @@ void setup() {
 }
 
 void loop() {
-  if(waiting == true) {
+  if (waiting == true) {
+    /* Waiting for T1 pressed */
     analogWrite(Ls, brightness);
     brightness = brightness + fadeAmount;
     if (brightness <= 0 || brightness >= 255) {
@@ -53,8 +60,30 @@ void loop() {
     delay(fadingSpeed);
     sleepCounter++;
   } else {
-    delay(5000);
-    initialState();
+    /* Playing */
+    if (forward == true) {
+      for (P = 1; P<=3; P++) {
+        if(P != 1) {
+          digitalWrite(Leds[P-2], LOW);
+        } else {
+          digitalWrite(Leds[P], LOW);
+        }
+        digitalWrite(Leds[P-1], HIGH);
+        delay(S);
+      }
+      forward = false;
+    } else {
+      for (P = 4; P>=2; P--) {
+        if(P != 4) {
+          digitalWrite(Leds[P], LOW);
+        } else {
+          digitalWrite(Leds[P-2], LOW);
+        }
+        digitalWrite(Leds[P-1], HIGH);
+        delay(S);
+      }
+      forward = true;
+    }
   }
   
 }
@@ -100,9 +129,6 @@ void startGame() {
   disableInterrupt(T1);
   Serial.println("Go!");
   digitalWrite(Ls, LOW);
-  for (int i=0; i<sizeof(Leds); i++) {
-    digitalWrite(Leds[i], HIGH);
-  }
   waiting = false;
   score = 0;
 }
