@@ -3,6 +3,8 @@
 #include "EnableInterrupt.h"
 #include "TimerOne.h"
 
+#define Pot A0
+
 #define T1 8
 #define T2 7
 #define T3 4
@@ -23,14 +25,16 @@ int fadingSpeed;
 int brightness;
 int fadeAmount;
 int score;
-boolean waiting;
+int appStatus;
 boolean forward;
 
 int S;
 int P;
-int t1;
-int t1_counter;
-int t2;
+float t1;
+float t1_counter;
+float t2;
+float F;
+float lvlFactor;
 
 void resetVarsToDefaultValue() {
   sleepCounter = 0;
@@ -39,12 +43,12 @@ void resetVarsToDefaultValue() {
   brightness = 0;
   fadeAmount = 5;
   score = 0;
-  waiting = true;
   forward = true;
-  S = 500;
+  S = 1000;
+  F = 1;
   P = 1;
   t1_counter = 0;
-  t2 = 5000;
+  t2 = 10000;
 }
 
 void setup() {
@@ -56,59 +60,90 @@ void setup() {
   for (int i = 0; i < sizeof(Leds); i++) {
     pinMode(Leds[i], OUTPUT);
   }
+  appStatus = 1;
   initialState();
 }
 
 void loop() {
-  if (waiting == true) {
-    /* Waiting for T1 pressed */
-    analogWrite(Ls, brightness);
-    brightness = brightness + fadeAmount;
-    if (brightness <= 0 || brightness >= 255) {
-      fadeAmount = -fadeAmount;
-    }
-    if (sleepCounter == sleepCountdown / fadingSpeed) {
-      Serial.println("I'm sleeping...");
-      sleepCounter = 0;
-      startSleep();
-    }
-    delay(fadingSpeed);
-    sleepCounter++;
-  } else {
-    /* Playing */
-    if (forward == true) {
-      for (P = 1; P <= 3; P++) {
-        if(P != 1) {
-          digitalWrite(Leds[P-2], LOW);
-        } else {
-          digitalWrite(Leds[P], LOW);
-        }
-        digitalWrite(Leds[P-1], HIGH);
-        if (t1  == S * t1_counter / 1000) {
-          checkBtnClick();
-          break;
-        }
-        delay(S);
-        t1_counter++;
+  switch (appStatus) {
+    case 1: /* Initial state */
+      // Waiting T1 to be clicked. If not, after 10s go to sleep.
+      analogWrite(Ls, brightness);
+      brightness = brightness + fadeAmount;
+      if (brightness <= 0 || brightness >= 255) {
+        fadeAmount = -fadeAmount;
       }
-      forward = false;
-    } else {
-      for (P = 4; P >= 2; P--) {
-        if(P != 4) {
-          digitalWrite(Leds[P], LOW);
-        } else {
-          digitalWrite(Leds[P-2], LOW);
-        }
-        digitalWrite(Leds[P-1], HIGH);
-        if (t1  == S * t1_counter / 1000) {
-          checkBtnClick();
-          break;
-        }
-        delay(S);
-        t1_counter++;
+      if (sleepCounter == sleepCountdown / fadingSpeed) {
+        Serial.println("I'm sleeping...");
+        sleepCounter = 0;
+        startSleep();
       }
-      forward = true;
-    }
+      delay(fadingSpeed);
+      sleepCounter++;
+      break;
+
+    case 2: /* RunBall state */
+      // Ball is traveling through the leds
+      if (forward == true) {
+        for (P = 1; P <= 3; P++) {
+          if(P != 1) {
+            digitalWrite(Leds[P-2], LOW);
+          } else {
+            digitalWrite(Leds[P], LOW);
+          }
+          digitalWrite(Leds[P-1], HIGH);
+          if (t1  <= S * t1_counter / (1000 * F)) {
+            appStatus = 3;
+            break;
+          }
+          delay(S / F);
+          t1_counter++;
+        }
+        forward = false;
+      } else {
+        for (P = 4; P >= 2; P--) {
+          if(P != 4) {
+            digitalWrite(Leds[P], LOW);
+          } else {
+            digitalWrite(Leds[P-2], LOW);
+          }
+          digitalWrite(Leds[P-1], HIGH);
+          if (t1  <= S * t1_counter / (1000 * F)) {
+            appStatus = 3;
+            break;
+          }
+          delay(S / F);
+          t1_counter++;
+        }
+        forward = true;
+      }
+      break;
+
+    case 3: /* CatchBall state */
+      // User must press the correct button to increase the score.
+      enableInterrupt(Btns[P-1], incScore, RISING);
+      delay(t2 / F);
+      disableInterrupt(Btns[P-1]);
+      if (t1_counter != 0) {
+        appStatus = 4;
+      }
+      digitalWrite(Leds[P-1], LOW);
+      break;
+
+    case 4: /* GameOver state */
+      // Game is over. Go back to initial state.
+      String str = "Game Over. Final Score: ";
+      str += score;
+      Serial.println(str);
+      delay(10000);
+      appStatus = 1;
+      initialState();
+      break;
+
+    default:
+      appStatus = 1;
+      initialState();
+      break;
   }
 }
 
@@ -145,45 +180,30 @@ void wakeUp() {
   for (int i = 0; i < sizeof(Btns); i++) {
     disableInterrupt(Btns[i]);
   }
+  appStatus = 1;
   initialState();
 }
 
 void startGame() {
   disableInterrupt(T1);
+  int potVal = analogRead(Pot);
+  lvlFactor = map(potVal, 0, 1023, 1, 8) * 0.25;
   Serial.println("Go!");
   digitalWrite(Ls, LOW);
   genRandom();
-  waiting = false;
+  appStatus = 2;
 }
 
 void incScore() {
-  score++;
-}
-
-void checkBtnClick() {
-  int tempScore = score;
-  enableInterrupt(Btns[P-1], incScore, RISING);
-  delay(t2);
-  if(tempScore == score) {
-    gameOver();
-  } else {
-    disableInterrupt(Btns[P-1]);
-    waiting = false;
-    forward = true;
-    P = 1;
-    t1_counter = 0;
-    genRandom();
-    String str = "New point! Score: ";
-    str += score;
-    Serial.println(str);
-  }
-}
-
-void gameOver() {
   disableInterrupt(Btns[P-1]);
-  String str = "Game Over. Final Score: ";
+  score++;
+  appStatus = 2;
+  forward = true;
+  F += lvlFactor;
+  P = 1;
+  t1_counter = 0;
+  genRandom();
+  String str = "New point! Score: ";
   str += score;
   Serial.println(str);
-  delay(10000);
-  initialState();
 }
