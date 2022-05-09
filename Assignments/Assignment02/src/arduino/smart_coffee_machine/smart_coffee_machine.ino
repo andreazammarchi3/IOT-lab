@@ -1,5 +1,6 @@
-#include "Timer.h"
 #include <LiquidCrystal.h>
+#include "Timer.h"
+#include "MsgService.h"
 
 #define bUp 13
 #define bDown 12
@@ -24,6 +25,7 @@ int nChocolate = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  MsgService.init();
   lcd.begin(16, 2);
   state = Boot;
   timer.setupPeriod(5000);
@@ -40,16 +42,34 @@ void step() {
       nTea = N_MAX_TEA;
       nChocolate = N_MAX_CHOCOLATE;
       state = Ready;
+      lcd.clear();
+      lcd.print("Ready");
       timer.setupPeriod(50);
       break;
       
     case Ready:
-      lcd.clear();
-      lcd.print("Ready");
+      if (MsgService.isMsgAvailable()){
+        Msg* msg = MsgService.receiveMsg();    
+        if (msg->getContent() == "ready"){
+            lcd.clear();
+            lcd.print("sending products availability");
+            MsgService.sendMsg("3");
+            MsgService.sendMsg("3");
+            MsgService.sendMsg("3");
+            lcd.clear();
+            lcd.print("sent products availability");
+         } else if (msg->getContent() == "0"){
+            lcd.clear();
+            lcd.print("0");
+            MsgService.sendMsg("0 printed");       
+         } 
+        /* NOT TO FORGET: msg deallocation */
+        delete msg;
+      }
       break;
       
     case Selecting:
-    
+      
       break;
   }
 }
