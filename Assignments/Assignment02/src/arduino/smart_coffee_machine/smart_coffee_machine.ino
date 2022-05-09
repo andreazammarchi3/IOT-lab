@@ -5,13 +5,21 @@
 #define bDown 12
 #define bMake 8
 
+#define N_MAX_COFFEE 3
+#define N_MAX_TEA 4
+#define N_MAX_CHOCOLATE 5
+
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+Timer timer;
+
+enum States {Boot, Ready, Selecting} state;
 
 int tempPin = 0;
 int potSugar = 1;
-Timer timer;
+int nCoffee = 0;
+int nTea = 0;
+int nChocolate = 0;
 
-enum States {Boot, Ready} state;
 
 void setup() {
   // put your setup code here, to run once:
@@ -28,11 +36,20 @@ void step() {
       lcd.print("Welcome to the:");
       lcd.setCursor(0,1);
       lcd.print("Coffee Machine!");
+      nCoffee = N_MAX_COFFEE;
+      nTea = N_MAX_TEA;
+      nChocolate = N_MAX_CHOCOLATE;
       state = Ready;
+      timer.setupPeriod(50);
       break;
+      
     case Ready:
       lcd.clear();
-      getTemperature();
+      lcd.print("Ready");
+      break;
+      
+    case Selecting:
+    
       break;
   }
 }
