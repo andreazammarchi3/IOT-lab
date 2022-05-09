@@ -10,6 +10,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
 int tempPin = 0;
 int potSugar = 1;
+char appState = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -17,13 +18,26 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   lcd.begin(16, 2);
+  appState = 0;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  lcd.clear();
-  getTemperature();
-  delay(1000);
+  switch (appState) {
+    case 1:
+      lcd.clear();
+      getTemperature();
+      delay(1000);
+      break;
+    default:
+      lcd.clear();
+      lcd.print("Welcome to the:");
+      lcd.setCursor(0,1);
+      lcd.print("Coffee Machine!");
+      delay(10000);
+      appState = 1;
+      break;
+  }
+  
 }
 
 int getDistance() {
