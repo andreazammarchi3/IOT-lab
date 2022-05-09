@@ -42,6 +42,7 @@ void loop() {
   step();
 }
 
+/*
 int getDistance() {
   float durata;
   int cm;
@@ -53,6 +54,7 @@ int getDistance() {
   durata = pulseIn(echoPin, HIGH);
   cm = durata / 58;
 }
+*/
 
 int getTemperature() {
   int reading = analogRead(tempPin);  
