@@ -1,43 +1,45 @@
+#include "Timer.h"
 #include <LiquidCrystal.h>
 
 #define bUp 13
 #define bDown 12
 #define bMake 8
-#define trigPin 10
-#define echoPin 11
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
 int tempPin = 0;
 int potSugar = 1;
-char appState = 0;
+Timer timer;
+
+enum States {Boot, Ready} state;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
   lcd.begin(16, 2);
-  appState = 0;
+  state = Boot;
+  timer.setupPeriod(5000);
 }
 
-void loop() {
-  switch (appState) {
-    case 1:
-      lcd.clear();
-      getTemperature();
-      delay(1000);
-      break;
-    default:
+void step() {
+  switch (state) {
+    case Boot:
       lcd.clear();
       lcd.print("Welcome to the:");
       lcd.setCursor(0,1);
       lcd.print("Coffee Machine!");
-      delay(10000);
-      appState = 1;
+      state = Ready;
+      break;
+    case Ready:
+      lcd.clear();
+      getTemperature();
       break;
   }
-  
+}
+
+void loop() {
+  timer.waitForNextTick();
+  step();
 }
 
 int getDistance() {
