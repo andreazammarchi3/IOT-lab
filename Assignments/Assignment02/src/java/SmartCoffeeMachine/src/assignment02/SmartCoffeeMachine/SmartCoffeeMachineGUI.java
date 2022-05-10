@@ -77,14 +77,27 @@ public class SmartCoffeeMachineGUI extends JFrame {
             JPanel buttonsPanel = new JPanel();
             jContentPane.add(buttonsPanel, BorderLayout.SOUTH);
             JButton refillBtn = new JButton("Refill");
+            JButton refreshBtn = new JButton("Refresh");
             JButton recoverBtn = new JButton("Recover");
             buttonsPanel.add(refillBtn, BorderLayout.WEST);
+            buttonsPanel.add(refreshBtn, BorderLayout.CENTER);
             buttonsPanel.add(recoverBtn, BorderLayout.EAST);
 
             refillBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     refill();
+                }
+            });
+
+            refreshBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        refreshGUI();
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 
@@ -99,7 +112,8 @@ public class SmartCoffeeMachineGUI extends JFrame {
     }
 
     public void refreshGUI() throws Exception {
-        modalityField.setText(tracker.getSerialData("modality"));
+        tracker.update();
+        modalityField.setText(tracker.getModality());
         for (int i = 0; i < tracker.getProducts().size(); i++) {
             productFields.get(i).setText(String.valueOf(tracker.getProducts().get(i).getAvailability()));
         }

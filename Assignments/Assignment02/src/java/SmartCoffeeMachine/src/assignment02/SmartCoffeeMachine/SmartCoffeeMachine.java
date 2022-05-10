@@ -11,11 +11,5 @@ public class SmartCoffeeMachine {
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        while (true) {
-            tracker.update();
-            frame.refreshGUI();
-            Thread.sleep(100);
-        }
     }
 }
