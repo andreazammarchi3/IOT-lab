@@ -104,6 +104,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
                 tracker.getProducts()) {
             product.setAvailability(product.getMaxAvailability());
         }
+        tracker.sendSerialData("refill");
     }
 
     public void recover() {

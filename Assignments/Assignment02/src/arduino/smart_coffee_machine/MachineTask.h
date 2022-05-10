@@ -8,7 +8,7 @@
 
 class MachineTask: public Task {
 
-    enum {Boot, Ready, Selecting, Making} state;
+    enum {Boot, Ready, Selecting, Making, Assistance} state;
     int periodCounter;
     
     public:

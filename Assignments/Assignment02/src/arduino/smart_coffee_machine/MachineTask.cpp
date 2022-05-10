@@ -25,6 +25,8 @@ extern int nTea;
 extern int nChocolate;
 extern int selfTests;
 
+extern bool refill;
+
 bool choosing = false;
 int selectingCounter = 0;
 int sugarQuantity = 0;
@@ -64,6 +66,7 @@ void MachineTask::tick() {
     
     case Ready:
         if (periodCounter == 0) {
+            modality = "working";
             lcd.clear();
             lcd.print("Ready");
         } else {
@@ -110,6 +113,31 @@ void MachineTask::tick() {
             }
             
             if (digitalRead(BTN_MAKE)) {
+                if (selectingCounter == 0) {
+                    if (nCoffee != 0) {
+                        nCoffee--;
+                    } else {
+                        state = Assistance;
+                        periodCounter = 0;
+                        break;
+                    }
+                } else if (selectingCounter == 1){
+                    if (nTea != 0) {
+                        nTea--;
+                    } else {
+                        state = Assistance;
+                        periodCounter = 0;
+                        break;
+                    }
+                } else if (selectingCounter == 2){
+                    if (nChocolate != 0) {
+                        nChocolate--;
+                    } else {
+                        state = Assistance;
+                        periodCounter = 0;
+                        break;
+                    }
+                }
                 sugarQuantity = map(analogRead(POT_SUGAR), 0, 1023, 0, 4);
                 state = Making;
                 periodCounter = 0;
@@ -143,6 +171,27 @@ void MachineTask::tick() {
             } else if (selectingCounter == 2){
                 lcd.print("The Chocolate is ready");
             }
+            state = Ready;
+            periodCounter = 0;
+            break;
+        }
+        periodCounter++;
+        break;
+
+    case Assistance:
+        if (periodCounter == 0) {
+            lcd.clear();
+            lcd.print("Assistance");
+            lcd.setCursor(0,1);
+            lcd.print("required");
+            lcd.setCursor(0,0);
+            modality = "assistance";
+        } else if (refill == true) {
+            modality = "working";
+            nCoffee = N_MAX_COFFEE;
+            nTea = N_MAX_TEA;
+            nChocolate = N_MAX_CHOCOLATE;
+            refill = false;
             state = Ready;
             periodCounter = 0;
             break;

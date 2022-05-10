@@ -15,20 +15,22 @@ int BTN_DOWN = 12;
 int BTN_MAKE = 8;
 int SERVO_PIN = 9;
 
-int N_MAX_COFFEE = 3;
+int N_MAX_COFFEE = 1;
 int N_MAX_TEA = 4;
 int N_MAX_CHOCOLATE = 5;
 
-int MSG_TASK_PERIOD = 500;
+int MSG_TASK_PERIOD = 200;
 int MACHINE_TASK_PERIOD = 100;
 
 int T_MAKING = 10000;
 
-String modality = "Idle"; 
+String modality = "working"; 
 int nCoffee = N_MAX_COFFEE;
 int nTea = N_MAX_TEA;
 int nChocolate = N_MAX_CHOCOLATE;
 int selfTests = 0;
+
+bool refill = false;
 
 void setup() {
   // put your setup code here, to run once:

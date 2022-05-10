@@ -13,12 +13,11 @@ public class SmartCoffeeMachine {
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.refreshGUI();
 
         while (true) {
             tracker.update();
             frame.refreshGUI();
-            Thread.sleep(2000);
+            Thread.sleep(200);
         }
     }
 }
