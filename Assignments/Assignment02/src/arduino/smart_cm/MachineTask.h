@@ -5,6 +5,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <Ultrasonic.h>
 #include <avr/sleep.h>
+#include <avr/wdt.h>
 #include "ServoTimer2.h"
 #include "Task.h"
 
@@ -17,12 +18,14 @@ class MachineTask: public Task {
     int sugarQuantity = 0;
     int servoPosition;
     int testPeriodCounter = 0;
+
+    private:
+        static void wakeUp();
     
     public:
         MachineTask();
         void init(int period);
         void tick();
-        static void wakeUp();
 };
 
 #endif

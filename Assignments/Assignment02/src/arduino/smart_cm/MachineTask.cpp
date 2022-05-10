@@ -252,6 +252,7 @@ void MachineTask::tick() {
             periodCounter = 0;
             break;
         } else if (recover == true) {
+            servo.write(750);
             modality = "working";
             recover = false;
             state = Ready;
@@ -311,7 +312,6 @@ void MachineTask::tick() {
         lcd.print("testing");
         if(t < TEMP_MIN || t > TEMP_MAX) {
             state = Assistance;
-            servo.write(750);
             periodCounter = 0;
             break;
         }

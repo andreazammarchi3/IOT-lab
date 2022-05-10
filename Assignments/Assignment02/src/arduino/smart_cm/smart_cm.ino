@@ -33,7 +33,7 @@ int T_IDLE = 5000;
 int T_CHECK = 20000;
 
 int TEMP_MIN = 17;
-int TEMP_MAX = 25;
+int TEMP_MAX = 28;
 
 String modality = "working"; 
 int nCoffee = N_MAX_COFFEE;
