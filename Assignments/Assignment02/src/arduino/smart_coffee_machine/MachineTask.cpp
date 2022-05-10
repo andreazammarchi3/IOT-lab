@@ -56,6 +56,7 @@ void MachineTask::tick() {
             lcd.print("Welcome to the:");
             lcd.setCursor(0,1);
             lcd.print("Coffee Machine!");
+            servo.write(750);
         } else if (periodCounter >= 20) {
             state = Ready;
             periodCounter = 0;
