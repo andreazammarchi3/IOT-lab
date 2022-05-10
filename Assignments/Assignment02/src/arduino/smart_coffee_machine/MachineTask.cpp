@@ -118,24 +118,30 @@ void MachineTask::tick() {
                     if (nCoffee != 0) {
                         nCoffee--;
                     } else {
-                        state = Assistance;
+                        state = Ready;
                         periodCounter = 0;
+                        lcd.clear();
+                        lcd.print("Product not available.");
                         break;
                     }
                 } else if (selectingCounter == 1){
                     if (nTea != 0) {
                         nTea--;
                     } else {
-                        state = Assistance;
+                        state = Ready;
                         periodCounter = 0;
+                        lcd.clear();
+                        lcd.print("Product not available.");
                         break;
                     }
                 } else if (selectingCounter == 2){
                     if (nChocolate != 0) {
                         nChocolate--;
                     } else {
-                        state = Assistance;
+                        state = Ready;
                         periodCounter = 0;
+                        lcd.clear();
+                        lcd.print("Product not available.");
                         break;
                     }
                 }
@@ -173,9 +179,15 @@ void MachineTask::tick() {
             } else if (selectingCounter == 2){
                 lcd.print("The Chocolate is ready");
             }
-            state = Ready;
+            if (nCoffee == 0 && nTea == 0 && nChocolate == 0) {
+                state = Assistance;
+                periodCounter = 0;
+                break;
+            } else {
+                state = Ready;
             periodCounter = 0;
             break;
+            }
         }
         periodCounter++;
         break;
