@@ -1,8 +1,6 @@
 package assignment02.SmartCoffeeMachine;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SmartCoffeeMachine {
     public static void main(String[] args) throws Exception {
@@ -17,7 +15,7 @@ public class SmartCoffeeMachine {
         while (true) {
             tracker.update();
             frame.refreshGUI();
-            Thread.sleep(200);
+            Thread.sleep(100);
         }
     }
 }

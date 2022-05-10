@@ -87,12 +87,19 @@ public class SmartCoffeeMachineGUI extends JFrame {
                     refill();
                 }
             });
+
+            recoverBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    recover();
+                }
+            });
         }
         return jContentPane;
     }
 
-    public void refreshGUI() {
-        modalityField.setText(tracker.getModality());
+    public void refreshGUI() throws Exception {
+        modalityField.setText(tracker.getSerialData("modality"));
         for (int i = 0; i < tracker.getProducts().size(); i++) {
             productFields.get(i).setText(String.valueOf(tracker.getProducts().get(i).getAvailability()));
         }
@@ -108,7 +115,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
     }
 
     public void recover() {
-
+        tracker.sendSerialData("recover");
     }
 
     private JPanel createProductPanel(Product product) {

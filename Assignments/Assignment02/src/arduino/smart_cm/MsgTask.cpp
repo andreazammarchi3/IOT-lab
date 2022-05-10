@@ -7,6 +7,7 @@ extern int nChocolate;
 extern int selfTests;
 
 extern bool refill;
+extern bool recover;
 
 void MsgTask::init(int period) {
     Task::init(period);
@@ -28,6 +29,8 @@ void MsgTask::tick() {
               MsgService.sendMsg(String(selfTests));
            } else if (msg->getContent() == "refill"){
               refill = true;
+           } else if (msg->getContent() == "recover"){
+              recover = true;
            }
           delete msg;
         }
