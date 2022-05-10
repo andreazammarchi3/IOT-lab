@@ -14,19 +14,19 @@ public class SmartCoffeeMachineGUI extends JFrame {
     private JTextField selfTestsField;
     private final SmartCoffeeMachineTracker tracker;
     
-    public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) {
+    public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) throws Exception {
         super();
         this.tracker = tracker;
         initialize();
     }
 
-    private void initialize() {
+    private void initialize() throws Exception {
         this.setSize(400, 300);
         this.setContentPane(getJContentPane());
         this.setTitle("SmartCoffeeMachine GUI");
     }
 
-    private JPanel getJContentPane() {
+    private JPanel getJContentPane() throws Exception {
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
@@ -107,6 +107,8 @@ public class SmartCoffeeMachineGUI extends JFrame {
                     recover();
                 }
             });
+
+            refreshGUI();
         }
         return jContentPane;
     }
