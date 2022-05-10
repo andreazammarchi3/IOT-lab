@@ -1,24 +1,28 @@
 #include <String.h>
-#include "Timer.h"
 #include "MsgService.h"
 #include "Scheduler.h"
 #include "MsgTask.h"
 #include "MachineTask.h"
 
-Timer timer;
 Scheduler sched;
 
 enum States {Boot, Ready, Selecting} state;
 
-int tempPin = 0;
-int potSugar = 1;
-int bUp = 13;
-int bDown = 12;
-int bMake = 8;
+int TEMP_PIN = 0;
+int POT_SUGAR = 1;
+int BTN_UP = 13;
+int BTN_DOWN = 12;
+int BTN_MAKE = 8;
+int SERVO_PIN = 9;
 
-static int N_MAX_COFFEE = 3;
-static int N_MAX_TEA = 4;
-static int N_MAX_CHOCOLATE = 5;
+int N_MAX_COFFEE = 3;
+int N_MAX_TEA = 4;
+int N_MAX_CHOCOLATE = 5;
+
+int MSG_TASK_PERIOD = 500;
+int MACHINE_TASK_PERIOD = 100;
+
+int T_MAKING = 10000;
 
 String modality = "Idle"; 
 int nCoffee = N_MAX_COFFEE;
@@ -28,14 +32,14 @@ int selfTests = 0;
 
 void setup() {
   // put your setup code here, to run once:
-  sched.init(50);
+  sched.init(MACHINE_TASK_PERIOD);
 
   Task* t0 = new MsgTask();
-  t0->init(500);
+  t0->init(MSG_TASK_PERIOD);
   sched.addTask(t0);
 
   Task* t1 = new MachineTask();
-  t1->init(50);
+  t1->init(MACHINE_TASK_PERIOD);
   sched.addTask(t1);
 }
 

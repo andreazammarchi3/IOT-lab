@@ -3,11 +3,12 @@
 
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include "ServoTimer2.h"
 #include "Task.h"
 
 class MachineTask: public Task {
 
-    enum {Boot, Ready, Selecting} state;
+    enum {Boot, Ready, Selecting, Making} state;
     int periodCounter;
     
     public:

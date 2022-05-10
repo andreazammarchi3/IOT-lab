@@ -1,22 +1,10 @@
 #include "MsgTask.h"
 
-extern int tempPin;
-extern int potSugar;
-extern int bUp;
-extern int bDown;
-extern int bMake;
-
-extern int N_MAX_COFFEE;
-extern int N_MAX_TEA;
-extern int N_MAX_CHOCOLATE;
-
 extern String modality;
 extern int nCoffee;
 extern int nTea;
 extern int nChocolate;
 extern int selfTests;
-
-
 
 void MsgTask::init(int period) {
     Task::init(period);
