@@ -18,11 +18,11 @@ void MachineTask::tick() {
     case Boot:
         if (periodCounter == 0) {
             lcd.clear();
-            lcd.setCursor(1,0);
+            lcd.setCursor(0,0);
             lcd.print("Welcome to the:");
-            lcd.setCursor(1,1);
+            lcd.setCursor(0,1);
             lcd.print("Coffee Machine!");
-        } else if (periodCounter >= 100) {
+        } else if (periodCounter >= 40) {
             state = Ready;
             periodCounter = 0;
             break;
