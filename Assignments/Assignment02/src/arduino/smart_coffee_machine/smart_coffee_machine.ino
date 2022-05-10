@@ -28,7 +28,7 @@ void setup() {
   MsgService.init();
   lcd.begin(16, 2);
   state = Boot;
-  timer.setupPeriod(5000);
+  timer.setupPeriod(10000);
 }
 
 void step() {
@@ -43,25 +43,21 @@ void step() {
       nChocolate = N_MAX_CHOCOLATE;
       state = Ready;
       lcd.clear();
-      lcd.print("Ready");
+      lcd.print("");
       timer.setupPeriod(50);
       break;
       
     case Ready:
       if (MsgService.isMsgAvailable()){
         Msg* msg = MsgService.receiveMsg();    
-        if (msg->getContent() == "ready"){
-            lcd.clear();
-            lcd.print("sending products availability");
-            MsgService.sendMsg("3");
-            MsgService.sendMsg("3");
-            MsgService.sendMsg("3");
-            lcd.clear();
-            lcd.print("sent products availability");
-         } else if (msg->getContent() == "0"){
-            lcd.clear();
-            lcd.print("0");
-            MsgService.sendMsg("0 printed");       
+        if (msg->getContent() == "modality"){
+            MsgService.sendMsg("Idle");
+         } else if (msg->getContent() == "Coffee"){
+            MsgService.sendMsg("5"); 
+         } else if (msg->getContent() == "Tea"){
+            MsgService.sendMsg("6");   
+         } else if (msg->getContent() == "Chocolate"){
+            MsgService.sendMsg("7");  
          } 
         /* NOT TO FORGET: msg deallocation */
         delete msg;

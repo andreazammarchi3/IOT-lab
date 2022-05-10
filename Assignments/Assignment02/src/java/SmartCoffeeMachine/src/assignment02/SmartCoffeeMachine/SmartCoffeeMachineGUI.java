@@ -2,22 +2,26 @@ package assignment02.SmartCoffeeMachine;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SmartCoffeeMachineGUI extends JFrame {
     private JPanel jContentPane = null;
-    private JTextField coffeeField = new JTextField();
-    private JTextField teaField = new JTextField();
-    private JTextField chocolateField = new JTextField();
-
-    public SmartCoffeeMachineGUI() {
+    private JTextField modalityField;
+    private List<JTextField> productFields;
+    private JTextField selfTestsField;
+    private final SmartCoffeeMachineTracker tracker;
+    
+    public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) {
         super();
+        this.tracker = tracker;
         initialize();
     }
 
     private void initialize() {
-        this.setSize(300, 200);
+        this.setSize(400, 300);
         this.setContentPane(getJContentPane());
         this.setTitle("SmartCoffeeMachine GUI");
     }
@@ -32,13 +36,9 @@ public class SmartCoffeeMachineGUI extends JFrame {
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
             jContentPane.add(panel, BorderLayout.CENTER);
 
-            JPanel buttonsPanel = new JPanel();
-            jContentPane.add(buttonsPanel, BorderLayout.SOUTH);
-            JButton refillBtn = new JButton("Refill");
-            JButton recoverBtn = new JButton("Recover");
-            buttonsPanel.add(refillBtn, BorderLayout.WEST);
-            buttonsPanel.add(recoverBtn, BorderLayout.EAST);
-
+            /*
+            Panels for data view
+             */
             JPanel modalityPanel = new JPanel();
             modalityPanel.setLayout(new BoxLayout(modalityPanel, BoxLayout.Y_AXIS));
             panel.add(modalityPanel);
@@ -52,35 +52,73 @@ public class SmartCoffeeMachineGUI extends JFrame {
             panel.add(selfTestsPanel);
 
             modalityPanel.add(new JLabel("Machine state:"));
-            JTextField modalityField = new JTextField();
+            modalityField = new JTextField();
             modalityField.setText("modality");
             modalityField.setEditable(false);
             modalityPanel.add(modalityField);
 
             availabilityPanel.add(new JLabel("Products availability:"));
-            availabilityPanel.add(new JLabel("Coffee:"));
-            coffeeField.setText("coffee1");
-            coffeeField.setEditable(false);
-            availabilityPanel.add(coffeeField);
-            availabilityPanel.add(new JLabel("Tea:"));
-            teaField.setText("tea2");
-            teaField.setEditable(false);
-            availabilityPanel.add(teaField);
-            availabilityPanel.add(new JLabel("Chocolate:"));
-            chocolateField.setText("chocolate3");
-            chocolateField.setEditable(false);
-            availabilityPanel.add(chocolateField);
+            productFields = new ArrayList<>();
+            for (Product product:
+                 tracker.getProducts()) {
+                JPanel productPanel = createProductPanel(product);
+                availabilityPanel.add(productPanel);
+            }
 
             selfTestsPanel.add(new JLabel("Self-tests performed:"));
-            JTextField selfTestsField = new JTextField();
-            selfTestsField.setText("self-test4");
+            selfTestsField = new JTextField();
+            selfTestsField.setText(String.valueOf(0));
             selfTestsField.setEditable(false);
             selfTestsPanel.add(selfTestsField);
+
+            /*
+            Action buttons
+             */
+            JPanel buttonsPanel = new JPanel();
+            jContentPane.add(buttonsPanel, BorderLayout.SOUTH);
+            JButton refillBtn = new JButton("Refill");
+            JButton recoverBtn = new JButton("Recover");
+            buttonsPanel.add(refillBtn, BorderLayout.WEST);
+            buttonsPanel.add(recoverBtn, BorderLayout.EAST);
+
+            refillBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    refill();
+                }
+            });
         }
         return jContentPane;
     }
 
     public void refreshGUI() {
+        modalityField.setText(tracker.getModality());
+        for (int i = 0; i < tracker.getProducts().size(); i++) {
+            productFields.get(i).setText(String.valueOf(tracker.getProducts().get(i).getAvailability()));
+        }
+        selfTestsField.setText(String.valueOf(tracker.getSelfTests()));
+    }
 
+    public void refill() {
+        for (Product product:
+                tracker.getProducts()) {
+            product.setAvailability(product.getMaxAvailability());
+        }
+    }
+
+    public void recover() {
+
+    }
+
+    private JPanel createProductPanel(Product product) {
+        JPanel productPanel = new JPanel();
+        productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
+        productPanel.add(new JLabel(product.getLabel()));
+        JTextField productField = new JTextField();
+        productField.setText(product.getLabel());
+        productField.setEditable(false);
+        productFields.add(productField);
+        productPanel.add(productField);
+        return productPanel;
     }
 }
