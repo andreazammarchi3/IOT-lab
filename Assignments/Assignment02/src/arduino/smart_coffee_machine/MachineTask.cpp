@@ -138,6 +138,7 @@ void MachineTask::tick() {
                         break;
                     }
                 }
+                selectingCounter = 0;
                 sugarQuantity = map(analogRead(POT_SUGAR), 0, 1023, 0, 4);
                 state = Making;
                 periodCounter = 0;
