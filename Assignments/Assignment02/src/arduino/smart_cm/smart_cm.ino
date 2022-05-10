@@ -58,20 +58,6 @@ void loop() {
 }
 
 /*
-int getDistance() {
-  float durata;
-  int cm;
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  durata = pulseIn(echoPin, HIGH);
-  cm = durata / 58;
-}
-*/
-
-/*
 int getTemperature() {
   int reading = analogRead(tempPin);  
   float voltage = reading * 5.0;
