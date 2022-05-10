@@ -8,12 +8,18 @@ Scheduler sched;
 
 enum States {Boot, Ready, Selecting} state;
 
+// Analog pins
 int TEMP_PIN = 0;
 int POT_SUGAR = 1;
-int BTN_UP = 13;
-int BTN_DOWN = 12;
+
+// Digital pins
+int PR_PIN = 7;
 int BTN_MAKE = 8;
 int SERVO_PIN = 9;
+int ECHO_PIN = 10;
+int TRIG_PIN = 11;
+int BTN_DOWN = 12;
+int BTN_UP = 13;
 
 int N_MAX_COFFEE = 1;
 int N_MAX_TEA = 4;
@@ -23,6 +29,8 @@ int MSG_TASK_PERIOD = 200;
 int MACHINE_TASK_PERIOD = 100;
 
 int T_MAKING = 10000;
+int T_TIMEOUT = 5000;
+int T_IDLE = 30000;
 
 String modality = "working"; 
 int nCoffee = N_MAX_COFFEE;
