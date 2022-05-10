@@ -1,6 +1,7 @@
 #ifndef __MSGTASK__
 #define __MSGTASK__
 
+#include <String.h>
 #include "Task.h"
 #include "MsgService.h"
 

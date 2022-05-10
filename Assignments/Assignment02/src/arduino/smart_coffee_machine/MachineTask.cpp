@@ -34,6 +34,8 @@ void MachineTask::tick() {
         if (periodCounter == 0) {
             lcd.clear();
             lcd.print("Ready");
+        } else {
+          
         }
         periodCounter++;
         break;

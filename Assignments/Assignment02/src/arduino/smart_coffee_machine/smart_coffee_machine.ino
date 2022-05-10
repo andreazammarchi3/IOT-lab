@@ -1,16 +1,9 @@
+#include <String.h>
 #include "Timer.h"
 #include "MsgService.h"
 #include "Scheduler.h"
 #include "MsgTask.h"
 #include "MachineTask.h"
-
-#define bUp 13
-#define bDown 12
-#define bMake 8
-
-#define N_MAX_COFFEE 3
-#define N_MAX_TEA 4
-#define N_MAX_CHOCOLATE 5
 
 Timer timer;
 Scheduler sched;
@@ -19,16 +12,19 @@ enum States {Boot, Ready, Selecting} state;
 
 int tempPin = 0;
 int potSugar = 1;
+int bUp = 13;
+int bDown = 12;
+int bMake = 8;
 
-char modality[] = "Idle"; 
-int nCoffee = 0;
-int nTea = 0;
-int nChocolate = 0;
+static int N_MAX_COFFEE = 3;
+static int N_MAX_TEA = 4;
+static int N_MAX_CHOCOLATE = 5;
+
+String modality = "Idle"; 
+int nCoffee = N_MAX_COFFEE;
+int nTea = N_MAX_TEA;
+int nChocolate = N_MAX_CHOCOLATE;
 int selfTests = 0;
-
-int timerPeriod = 50;
-int periodCounter = 0;
-
 
 void setup() {
   // put your setup code here, to run once:
