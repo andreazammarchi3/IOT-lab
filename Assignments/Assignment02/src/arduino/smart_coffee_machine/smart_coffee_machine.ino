@@ -1,6 +1,8 @@
-#include <LiquidCrystal.h>
 #include "Timer.h"
 #include "MsgService.h"
+#include "Scheduler.h"
+#include "MsgTask.h"
+#include "MachineTask.h"
 
 #define bUp 13
 #define bDown 12
@@ -10,17 +12,19 @@
 #define N_MAX_TEA 4
 #define N_MAX_CHOCOLATE 5
 
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 Timer timer;
+Scheduler sched;
 
 enum States {Boot, Ready, Selecting} state;
 
 int tempPin = 0;
 int potSugar = 1;
 
+char modality[] = "Idle"; 
 int nCoffee = 0;
 int nTea = 0;
 int nChocolate = 0;
+int selfTests = 0;
 
 int timerPeriod = 50;
 int periodCounter = 0;
@@ -28,67 +32,19 @@ int periodCounter = 0;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  MsgService.init();
-  lcd.begin(16, 2);
-  state = Boot;
-  timer.setupPeriod(timerPeriod);
-}
+  sched.init(50);
 
-void step() {
-  switch (state) {
-    case Boot:
-      if (periodCounter == 0) {
-        lcd.clear();
-        lcd.print("Welcome to the:");
-        lcd.setCursor(0,1);
-        lcd.print("Coffee Machine!");
-        nCoffee = N_MAX_COFFEE;
-        nTea = N_MAX_TEA;
-        nChocolate = N_MAX_CHOCOLATE;
-      } else if (periodCounter == 100) {
-        state = Ready;
-        periodCounter = 0;
-        break;
-      }
-      Serial.println(periodCounter);
-      periodCounter++;
-      break;
-      
-    case Ready:
-      if (periodCounter == 0) {
-        lcd.clear();
-        lcd.print("Ready");
-      } else {
-        if (MsgService.isMsgAvailable()){
-          Msg* msg = MsgService.receiveMsg();    
-          if (msg->getContent() == "modality"){
-              MsgService.sendMsg("Idle");
-           } else if (msg->getContent() == "Coffee"){
-              MsgService.sendMsg("5"); 
-           } else if (msg->getContent() == "Tea"){
-              MsgService.sendMsg("6");   
-           } else if (msg->getContent() == "Chocolate"){
-              MsgService.sendMsg("7");  
-           } 
-          /* NOT TO FORGET: msg deallocation */
-          delete msg;
-        }
-      }
-      periodCounter++;
-      Serial.println(periodCounter);
-      break;
-      
-    case Selecting:
-      lcd.clear();
-      lcd.print("Selecting");
-      break;
-  }
+  Task* t0 = new MsgTask();
+  t0->init(500);
+  sched.addTask(t0);
+
+  Task* t1 = new MachineTask();
+  t1->init(50);
+  sched.addTask(t1);
 }
 
 void loop() {
-  timer.waitForNextTick();
-  step();
+  sched.schedule();
 }
 
 /*
@@ -105,6 +61,7 @@ int getDistance() {
 }
 */
 
+/*
 int getTemperature() {
   int reading = analogRead(tempPin);  
   float voltage = reading * 5.0;
@@ -116,3 +73,4 @@ int getTemperature() {
   lcd.print("C");
   return temperatureC;
 }
+*/
