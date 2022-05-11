@@ -90,5 +90,6 @@ public class SmartCoffeeMachineTracker {
             int availability = Integer.parseInt(getSerialData(product.getLabel()));
             product.setAvailability(availability);
         }
+        selfTests = Integer.parseInt(getSerialData("selfTests"));
     }
 }
