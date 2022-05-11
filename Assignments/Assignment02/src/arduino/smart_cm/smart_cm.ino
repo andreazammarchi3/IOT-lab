@@ -12,7 +12,7 @@
 #include "MsgTask.h"
 #include "MachineTask.h"
 
-#define SCHE_PERIOD 100
+#define SCHED_PERIOD 100
 
 /*  For a better user experience, all of the vars
  *  are delcared here...
@@ -35,8 +35,8 @@ int BTN_UP = 13;
 
 // Products max availability
 int N_MAX_COFFEE = 1;
-int N_MAX_TEA = 4;
-int N_MAX_CHOCOLATE = 5;
+int N_MAX_TEA = 0;
+int N_MAX_CHOCOLATE = 0;
 
 // Tasks period
 int MSG_TASK_PERIOD = 100;
@@ -44,13 +44,13 @@ int MACHINE_TASK_PERIOD = 100;
 
 // Some times deadline
 int T_MAKING = 10000;
-int T_TIMEOUT = 5000;
-int T_IDLE = 5000;
-int T_CHECK = 20000;
+int T_TIMEOUT = 10000;
+int T_IDLE = 10000;
+int T_CHECK = 30000;
 
 // Temperature range
-int TEMP_MIN = 17;
-int TEMP_MAX = 28;
+int TEMP_MIN = 12;
+int TEMP_MAX = 55;
 
 // Current machine modality
 String modality = "working";
