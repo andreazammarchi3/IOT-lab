@@ -7,11 +7,34 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class, extends a JFrame from javax.swing
+ */
 public class SmartCoffeeMachineGUI extends JFrame {
+
+    /**
+     * Content panel
+     */
     private JPanel jContentPane = null;
+
+    /**
+     * Text field containing the actual modality of the machine
+     */
     private JTextField modalityField;
+
+    /**
+     * List of text fields containing the availability for each product (Coffee, Tea, Chocolate)
+     */
     private List<JTextField> productFields;
+
+    /**
+     * Text field containing the number of self tests performed by the machine
+     */
     private JTextField selfTestsField;
+
+    /**
+     * Global tracker containing updated values from the machine
+     */
     private final SmartCoffeeMachineTracker tracker;
     
     public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) throws Exception {
@@ -26,6 +49,9 @@ public class SmartCoffeeMachineGUI extends JFrame {
         this.setTitle("SmartCoffeeMachine GUI");
     }
 
+    /**
+     * Create the content panel and its children layouts
+     */
     private JPanel getJContentPane() throws Exception {
         if (jContentPane == null) {
             jContentPane = new JPanel();
@@ -59,7 +85,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
 
             availabilityPanel.add(new JLabel("Products availability:"));
             productFields = new ArrayList<>();
-            for (Product product:
+            for (ProductImpl product:
                  tracker.getProducts()) {
                 JPanel productPanel = createProductPanel(product);
                 availabilityPanel.add(productPanel);
@@ -113,6 +139,9 @@ public class SmartCoffeeMachineGUI extends JFrame {
         return jContentPane;
     }
 
+    /**
+     * Refresh GUI with new values
+     */
     public void refreshGUI() throws Exception {
         tracker.update();
         modalityField.setText(tracker.getModality());
@@ -122,19 +151,25 @@ public class SmartCoffeeMachineGUI extends JFrame {
         selfTestsField.setText(String.valueOf(tracker.getSelfTests()));
     }
 
+    /**
+     * Refill the machine with the starting products availabilities
+     */
     public void refill() {
-        for (Product product:
+        for (ProductImpl product:
                 tracker.getProducts()) {
             product.setAvailability(product.getMaxAvailability());
         }
         tracker.sendSerialData("refill");
     }
 
+    /**
+     * Recover the machine if a self test failed.
+     */
     public void recover() {
         tracker.sendSerialData("recover");
     }
 
-    private JPanel createProductPanel(Product product) {
+    private JPanel createProductPanel(ProductImpl product) {
         JPanel productPanel = new JPanel();
         productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
         productPanel.add(new JLabel(product.getLabel()));

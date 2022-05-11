@@ -4,10 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Global tracker of the machine, containing updated values
+ */
 public class SmartCoffeeMachineTracker {
+
+    /**
+     * Serial Communication Channel
+     */
     private SerialCommChannel channel;
+
+    /**
+     * Current machine modality
+     */
     private String modality;
+
+    /**
+     * List of products
+     */
     private List<Product> products;
+
+    /**
+     * Number of self tests performed
+     */
     private int selfTests;
 
     public SmartCoffeeMachineTracker() throws Exception {
