@@ -1,5 +1,4 @@
 #include <String.h>
-#include "MsgService.h"
 #include "Scheduler.h"
 #include "MsgTask.h"
 #include "MachineTask.h"
@@ -13,7 +12,7 @@ int TEMP_PIN = 0;
 int POT_SUGAR = 1;
 
 // Digital pins
-int PR_PIN = 7;
+int PR_PIN = 2;
 int BTN_MAKE = 8;
 int SERVO_PIN = 9;
 int ECHO_PIN = 10;
@@ -25,12 +24,16 @@ int N_MAX_COFFEE = 1;
 int N_MAX_TEA = 4;
 int N_MAX_CHOCOLATE = 5;
 
-int MSG_TASK_PERIOD = 200;
+int MSG_TASK_PERIOD = 100;
 int MACHINE_TASK_PERIOD = 100;
 
 int T_MAKING = 10000;
 int T_TIMEOUT = 5000;
-int T_IDLE = 30000;
+int T_IDLE = 5000;
+int T_CHECK = 20000;
+
+int TEMP_MIN = 17;
+int TEMP_MAX = 28;
 
 String modality = "working"; 
 int nCoffee = N_MAX_COFFEE;
@@ -39,6 +42,7 @@ int nChocolate = N_MAX_CHOCOLATE;
 int selfTests = 0;
 
 bool refill = false;
+bool recover = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -56,31 +60,3 @@ void setup() {
 void loop() {
   sched.schedule();
 }
-
-/*
-int getDistance() {
-  float durata;
-  int cm;
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  durata = pulseIn(echoPin, HIGH);
-  cm = durata / 58;
-}
-*/
-
-/*
-int getTemperature() {
-  int reading = analogRead(tempPin);  
-  float voltage = reading * 5.0;
-  voltage /= 1024.0; 
-  int temperatureC = (voltage - 0.5) * 100 ; 
-  lcd.print(temperatureC);
-  lcd.print(" ");
-  lcd.print((char)223);
-  lcd.print("C");
-  return temperatureC;
-}
-*/

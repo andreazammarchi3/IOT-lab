@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class SmartCoffeeMachineTracker {
-    private final SerialCommChannel channel;
+    private SerialCommChannel channel;
     private String modality;
     private List<Product> products;
     private int selfTests;
@@ -46,6 +46,10 @@ public class SmartCoffeeMachineTracker {
 
     public void setSelfTests(int selfTests) {
         this.selfTests = selfTests;
+    }
+
+    public void setChannel(SerialCommChannel channel) {
+        this.channel = channel;
     }
 
     public String getModality() {

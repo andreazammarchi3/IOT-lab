@@ -14,19 +14,19 @@ public class SmartCoffeeMachineGUI extends JFrame {
     private JTextField selfTestsField;
     private final SmartCoffeeMachineTracker tracker;
     
-    public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) {
+    public SmartCoffeeMachineGUI(SmartCoffeeMachineTracker tracker) throws Exception {
         super();
         this.tracker = tracker;
         initialize();
     }
 
-    private void initialize() {
+    private void initialize() throws Exception {
         this.setSize(400, 300);
         this.setContentPane(getJContentPane());
         this.setTitle("SmartCoffeeMachine GUI");
     }
 
-    private JPanel getJContentPane() {
+    private JPanel getJContentPane() throws Exception {
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
@@ -77,8 +77,10 @@ public class SmartCoffeeMachineGUI extends JFrame {
             JPanel buttonsPanel = new JPanel();
             jContentPane.add(buttonsPanel, BorderLayout.SOUTH);
             JButton refillBtn = new JButton("Refill");
+            JButton refreshBtn = new JButton("Refresh");
             JButton recoverBtn = new JButton("Recover");
             buttonsPanel.add(refillBtn, BorderLayout.WEST);
+            buttonsPanel.add(refreshBtn, BorderLayout.CENTER);
             buttonsPanel.add(recoverBtn, BorderLayout.EAST);
 
             refillBtn.addActionListener(new ActionListener() {
@@ -87,11 +89,32 @@ public class SmartCoffeeMachineGUI extends JFrame {
                     refill();
                 }
             });
+
+            refreshBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        refreshGUI();
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
+
+            recoverBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    recover();
+                }
+            });
+
+            refreshGUI();
         }
         return jContentPane;
     }
 
-    public void refreshGUI() {
+    public void refreshGUI() throws Exception {
+        tracker.update();
         modalityField.setText(tracker.getModality());
         for (int i = 0; i < tracker.getProducts().size(); i++) {
             productFields.get(i).setText(String.valueOf(tracker.getProducts().get(i).getAvailability()));
@@ -108,7 +131,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
     }
 
     public void recover() {
-
+        tracker.sendSerialData("recover");
     }
 
     private JPanel createProductPanel(Product product) {
