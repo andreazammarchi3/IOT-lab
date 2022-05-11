@@ -85,7 +85,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
 
             availabilityPanel.add(new JLabel("Products availability:"));
             productFields = new ArrayList<>();
-            for (ProductImpl product:
+            for (Product product:
                  tracker.getProducts()) {
                 JPanel productPanel = createProductPanel(product);
                 availabilityPanel.add(productPanel);
@@ -155,7 +155,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
      * Refill the machine with the starting products availabilities
      */
     public void refill() {
-        for (ProductImpl product:
+        for (Product product:
                 tracker.getProducts()) {
             product.setAvailability(product.getMaxAvailability());
         }
@@ -169,7 +169,7 @@ public class SmartCoffeeMachineGUI extends JFrame {
         tracker.sendSerialData("recover");
     }
 
-    private JPanel createProductPanel(ProductImpl product) {
+    private JPanel createProductPanel(Product product) {
         JPanel productPanel = new JPanel();
         productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
         productPanel.add(new JLabel(product.getLabel()));
