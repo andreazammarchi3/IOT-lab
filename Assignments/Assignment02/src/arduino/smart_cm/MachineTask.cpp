@@ -73,6 +73,7 @@ void MachineTask::tick() {
     
     case Ready:
         if (testPeriodCounter >= T_CHECK / MACHINE_TASK_PERIOD) {
+            selfTests++;
             state = Testing;
             lcd.clear();
             lcd.print("testing");
@@ -106,6 +107,7 @@ void MachineTask::tick() {
 
     case Selecting:
         if (testPeriodCounter >= T_CHECK / MACHINE_TASK_PERIOD) {
+            selfTests++;
             state = Testing;
             lcd.clear();
             lcd.print("testing");
