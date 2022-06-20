@@ -1,2 +1,6 @@
-# IOT-lab
-IOT Arduino sketches
+# IOT
+
+### Indice
+
+- [Teoria](./Riassunto_IOT.md)
+- [Laboratorio](./Lab_IOT.md)
