@@ -87,4 +87,4 @@
         - Resistenza interna molto grande
     - Tester/multimetri
 
-### [Tutti gli esercizi svolti](https://bitbucket.org/aricci303/seiot1920/src/master/)
+### [Tutti gli esercizi svolti](https://github.com/andreazammarchi3/esiot-2122/tree/master)
