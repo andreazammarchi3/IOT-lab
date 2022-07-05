@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,5 +63,11 @@ public class MainActivity extends AppCompatActivity {
         buttonIrrigation.setOnClickListener(view ->
                 System.out.println("clicked")
         );
+
+        TextView led3Counter = findViewById(R.id.led_3_counter);
+
+        TextView led4Counter = findViewById(R.id.led_4_counter);
+
+        TextView irrigationCounter = findViewById(R.id.irrigation_counter);
     }
 }
