@@ -31,8 +31,7 @@ void loop()
 
 float getTemp() {
   tempVal = analogRead(tempPin);
-  volts = tempVal/4095.0;
-  temp = (volts - 0.5) * 100 ;
+  temp = ((tempVal * .000806) - 0.5) / 0.01;
   return temp;
 }
 
