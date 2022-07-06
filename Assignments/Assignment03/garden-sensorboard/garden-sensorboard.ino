@@ -1,11 +1,32 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-  
+
+//variabili globali
+int tempVal = 0;
+float temp;
+float volts;
+float lightVal;
+
+const int tempPin = 35;
+const int ledPin = 23;
+const int photoPin = 34;
+
 const char* ssid = "iPhone di Andrea";
 const char* password =  "infondoalmar";
+
+void setup()
+{
+  pinMode(tempPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(photoPin, INPUT);
   
-void setup() {
-  
+  digitalWrite(ledPin, HIGH);
+
+  Serial.print("Temperature: ");
+  Serial.println(getTemp());
+  Serial.print("Light: ");
+  Serial.println(getLight());
+
   Serial.begin(115200);
   delay(4000);
   WiFi.begin(ssid, password);
@@ -16,11 +37,10 @@ void setup() {
   }
   
   Serial.println("Connected to the WiFi network");
-  
 }
-  
-void loop() {
-  
+
+void loop()
+{ 
   if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
   
     HTTPClient http;
@@ -41,7 +61,17 @@ void loop() {
   
     http.end(); //Free the resources
   }
-  
+
   delay(10000);
-  
+}
+
+float getTemp() {
+  tempVal = analogRead(tempPin);
+  temp = ((tempVal * (3.3 / 4095)) - 0.5) / 0.01;
+  return temp;
+}
+
+int getLight() {
+  lightVal = analogRead(photoPin);
+  return lightVal;
 }
