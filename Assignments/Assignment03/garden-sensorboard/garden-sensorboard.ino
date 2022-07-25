@@ -11,8 +11,33 @@ const int tempPin = 35;
 const int ledPin = 23;
 const int photoPin = 34;
 
-const char* ssid = "iPhone di Andrea";
-const char* password =  "infondoalmar";
+const char* ssid = "AIR2";
+const char* password =  "giovanniboss";
+
+const char *serverPath = "http://www.google.it";
+
+void connectToWifi(const char* ssid, const char* password){
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP());
+}
+
+float getTemp() {
+  tempVal = analogRead(tempPin);
+  temp = ((tempVal * (3.3 / 4095)) - 0.5) / 0.01;
+  return temp;
+}
+
+int getLight() {
+  lightVal = analogRead(photoPin);
+  return lightVal;
+}
 
 void setup()
 {
@@ -29,49 +54,32 @@ void setup()
 
   Serial.begin(115200);
   delay(4000);
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
-  
-  Serial.println("Connected to the WiFi network");
+  connectToWifi(ssid, password);
 }
 
 void loop()
 { 
-  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
-  
+  if(WiFi.status()== WL_CONNECTED){      
     HTTPClient http;
   
-    http.begin("http://127.0.0.1:8080"); //Specify the URL
-    int httpCode = http.GET();                                        //Make the request
-  
-    if (httpCode > 0) { //Check for the returning code
-  
-        String payload = http.getString();
-        Serial.println(httpCode);
-        Serial.println(payload);
-      }
-  
-    else {
-      Serial.println("Error on HTTP request");
+    // Your Domain name with URL path or IP address with path
+    http.begin(serverPath);
+      
+    // Send HTTP GET request
+    int httpResponseCode = http.GET();
+      
+    if (httpResponseCode>0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = http.getString();
+      Serial.println(payload);
+    } else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
     }
-  
-    http.end(); //Free the resources
-  }
-
-  delay(10000);
-}
-
-float getTemp() {
-  tempVal = analogRead(tempPin);
-  temp = ((tempVal * (3.3 / 4095)) - 0.5) / 0.01;
-  return temp;
-}
-
-int getLight() {
-  lightVal = analogRead(photoPin);
-  return lightVal;
+    
+    // Free resources
+    http.end();
+    }
+   delay(2000);
 }
