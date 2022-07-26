@@ -7,23 +7,25 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class Main {
-    public static void main(String[] args)  throws Exception {
-        System.out.println("Hello world!");
-        HttpServer server = HttpServer.create(new InetSocketAddress(1201), 0);
-        server.createContext("/SmartGarden", new MyHandler());
-        server.setExecutor(null); // creates a default executor
-        server.start();
+
+    public static void main(String[] args) {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+            server.createContext("/test", new MyHandler());
+            server.setExecutor(null);
+            server.start();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     static class MyHandler implements HttpHandler {
+
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            OutputStream os = exchange.getResponseBody();
-            // extracting barcode from URL
-            String myBarcode = exchange.getRequestURI().toString();
-            System.out.println("My barcode: " + myBarcode);
-            String response = "{myData: \"myText\":\"Like\",\"otherText\":\"Subscribe\"}";
-            exchange.sendResponseHeaders(200, response.length());
+        public void handle(HttpExchange he) throws IOException {
+            String response = "CIAO SERVER!";
+            he.sendResponseHeaders(200, response.length());
+            OutputStream os = he.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }

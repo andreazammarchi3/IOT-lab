@@ -11,10 +11,10 @@ const int tempPin = 35;
 const int ledPin = 23;
 const int photoPin = 34;
 
-const char* ssid = "AIR2";
-const char* password =  "giovanniboss";
+const char* ssid = "Air";
+const char* password =  "Giov@nniboss43";
 
-const char *serverPath = "http://www.google.it";
+const char *serverPath = "www.unibo.it";
 
 void connectToWifi(const char* ssid, const char* password){
   WiFi.begin(ssid, password);
