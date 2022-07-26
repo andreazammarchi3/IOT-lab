@@ -23,14 +23,17 @@ public class MQTTAgent extends AbstractVerticle {
 
             log("subscribing...");
             client.publishHandler(s -> {
-                        System.out.println("There are new message in topic: " + s.topicName());
-                        System.out.println("Content(as string) of the message: " + s.payload().toString());
-                        System.out.println("QoS: " + s.qosLevel());
+                        System.out.println(s.topicName() + ": " + s.payload().toString());
                     })
-                    .subscribe("esiot-2122", 2);
+                    .subscribe("SmartGarden/temperature", 2);
+
+            client.publishHandler(s -> {
+                        System.out.println(s.topicName() + ": " + s.payload().toString());
+                    })
+                    .subscribe("SmartGarden/luminosity", 2);
 
             log("publishing a msg");
-            client.publish("esiot-2122",
+            client.publish("SmartGarden/output",
                     Buffer.buffer("hello"),
                     MqttQoS.AT_LEAST_ONCE,
                     false,
