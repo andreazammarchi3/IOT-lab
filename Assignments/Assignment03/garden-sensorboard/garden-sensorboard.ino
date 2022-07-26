@@ -11,10 +11,10 @@ const int tempPin = 35;
 const int ledPin = 23;
 const int photoPin = 34;
 
-const char* ssid = "Air";
-const char* password =  "Giov@nniboss43";
+const char* ssid = "iPhone di Andrea";
+const char* password =  "infondoalmar";
 
-const char *serverPath = "www.unibo.it";
+const char *serverPath = "https://3419-37-160-47-90.eu.ngrok.io";
 
 void connectToWifi(const char* ssid, const char* password){
   WiFi.begin(ssid, password);
