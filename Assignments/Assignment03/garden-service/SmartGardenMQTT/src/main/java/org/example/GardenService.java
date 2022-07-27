@@ -8,9 +8,6 @@ import java.net.*;
 
 public class GardenService extends AbstractVerticle {
 
-    private static int temperature = 0;
-    private static int luminosity = 0;
-
     public static void main(String[] args) throws Exception {
         Vertx vertx = Vertx.vertx();
         MQTTAgent agent = new MQTTAgent();
@@ -27,20 +24,15 @@ public class GardenService extends AbstractVerticle {
         // to send data to the client
         PrintStream ps = new PrintStream(s.getOutputStream());
 
+        String msg = "";
         // server executes continuously
-        while (agent.getLuminosity() != -1 && agent.getTemperature() != -1) {
-            // check if values changed
-            if (agent.getLuminosity() != luminosity || agent.getTemperature() != temperature) {
-                luminosity = agent.getLuminosity();
-                temperature = agent.getTemperature();
-                String tempMsg = "temperature: " + temperature;
-                String lumMsg = "luminosity: " + luminosity;
+        while (agent.getLuminosity() != null && agent.getTemperature() != null) {
+            String luminosity = agent.getLuminosity();
+            String temperature = agent.getTemperature();
+            msg = luminosity + "-" + temperature;
 
-                // send to client
-                ps.println(tempMsg);
-                ps.println(lumMsg);
-            }
-
+            // send to client
+            ps.println(msg);
         }
         ps.close();
         ss.close();

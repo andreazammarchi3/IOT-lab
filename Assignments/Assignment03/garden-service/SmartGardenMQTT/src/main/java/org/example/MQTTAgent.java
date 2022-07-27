@@ -10,8 +10,8 @@ import io.vertx.mqtt.MqttClient;
  */
 public class MQTTAgent extends AbstractVerticle {
 
-    private int temperature = 0;
-    private int luminosity = 0;
+    private String temperature = "";
+    private String luminosity = "";
 
     public MQTTAgent() {
     }
@@ -27,13 +27,13 @@ public class MQTTAgent extends AbstractVerticle {
             log("subscribing...");
             client.publishHandler(s -> {
                         System.out.println(s.topicName() + ": " + s.payload().toString());
-                        temperature = Integer.parseInt(s.payload().toString());
+                        temperature = s.payload().toString();
                     })
                     .subscribe("SmartGarden/temperature", 2);
 
             client.publishHandler(s -> {
                         System.out.println(s.topicName() + ": " + s.payload().toString());
-                        luminosity = Integer.parseInt(s.payload().toString());
+                        luminosity = s.payload().toString();
                     })
                     .subscribe("SmartGarden/luminosity", 2);
 
@@ -51,11 +51,11 @@ public class MQTTAgent extends AbstractVerticle {
         System.out.println("[DATA SERVICE] "+msg);
     }
 
-    public int getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public int getLuminosity() {
+    public String getLuminosity() {
         return luminosity;
     }
 }

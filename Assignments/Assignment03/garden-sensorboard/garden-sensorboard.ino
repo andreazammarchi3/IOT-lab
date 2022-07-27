@@ -105,14 +105,17 @@ void reconnect() {
   }
 }
 
-float getTemp() {
+int getTemp() {
   tempVal = analogRead(tempPin);
-  temp = ((tempVal * (3.3 / 4095)) - 0.5) / 0.01;
+  temp = map(temp, 0, 4096, 1, 8);
+  temp = int(temp);
   return temp;
 }
 
 int getLight() {
   lightVal = analogRead(photoPin);
+  lightVal = map(lightVal, 0, 4096, 1, 5);
+  lightVal = int(lightVal);
   return lightVal;
 }
 
@@ -146,14 +149,14 @@ void loop()
 
     /* Publishing the temperature */
     char tempString[8];
-    dtostrf(getTemp(), 1, 2, tempString);
+    dtostrf(getTemp(), 1, 0, tempString);
     Serial.print("Temperature: ");
     Serial.println(tempString);
     client.publish("SmartGarden/temperature", tempString);
 
     /* Publishing the luminosity*/
     char lightString[8];
-    dtostrf(getLight(), 1, 2, lightString);
+    dtostrf(getLight(), 1, 0, lightString);
     Serial.print("Luminosity: ");
     Serial.println(lightString);
     client.publish("SmartGarden/luminosity", lightString);

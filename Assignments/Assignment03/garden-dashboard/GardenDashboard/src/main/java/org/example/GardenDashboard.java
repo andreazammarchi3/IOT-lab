@@ -1,22 +1,18 @@
 package org.example;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.*;
+import java.util.Objects;
 
 public class GardenDashboard {
 
-    private static int temperature = 0;
-    private static int luminosity = 0;
-    private static GardenDashboardGUI GUI = new GardenDashboardGUI();
+    private static String temperature = "0";
+    private static String luminosity = "0";
+    //private static final GardenDashboardGUI GUI = new GardenDashboardGUI();
 
     public static void main(String[] args) throws Exception {
         // Start GUI
-        JFrame frame = new JFrame("Garden Dashboard");
-        frame.setContentPane(GUI.panel1);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
+        //GardenDashboardGUI frame = new GardenDashboardGUI();
 
         // Create client socket
         Socket s = new Socket("localhost", 888);
@@ -28,15 +24,12 @@ public class GardenDashboard {
                         s.getInputStream()));
 
         String inputStr;
-        while(temperature != -1 && luminosity != -1) {
+        while(temperature != null && luminosity != null) {
             inputStr = br.readLine();
-            if (inputStr.contains("temperature")) {
-                temperature = Integer.parseInt(inputStr.replace("temperature: ", ""));
-                GUI.setTemperatureLabel(temperature);
-            } else if (inputStr.contains("luminosity")) {
-                luminosity = Integer.parseInt(inputStr.replace("luminosity: ", ""));
-                GUI.setLuminosityLabel(luminosity);
-            }
+            String[] parts = inputStr.split("-");
+            luminosity = parts[0];
+            temperature = parts[1];
+            System.out.println("L:" + luminosity + "-T:" + temperature);
         }
         br.close();
         s.close();
