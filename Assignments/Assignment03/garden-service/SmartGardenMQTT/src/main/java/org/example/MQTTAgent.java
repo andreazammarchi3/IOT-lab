@@ -28,12 +28,14 @@ public class MQTTAgent extends AbstractVerticle {
             client.publishHandler(s -> {
                         System.out.println(s.topicName() + ": " + s.payload().toString());
                         temperature = s.payload().toString();
+                        System.out.println(temperature);
                     })
                     .subscribe("SmartGarden/temperature", 2);
 
             client.publishHandler(s -> {
                         System.out.println(s.topicName() + ": " + s.payload().toString());
                         luminosity = s.payload().toString();
+                        System.out.println(luminosity);
                     })
                     .subscribe("SmartGarden/luminosity", 2);
 
