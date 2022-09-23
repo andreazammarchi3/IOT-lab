@@ -27,6 +27,7 @@ public class GardenDashboard {
          */
 
         GardenDashboardGUI gui = new GardenDashboardGUI();
-        gui.setOutputTextAreaText("Prova\nN2\n");
+        gui.setValueL(8);
+        gui.setValueT(5);
     }
 }
