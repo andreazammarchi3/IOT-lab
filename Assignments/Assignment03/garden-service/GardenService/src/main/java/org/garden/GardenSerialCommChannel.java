@@ -10,12 +10,8 @@ public class GardenSerialCommChannel {
         channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
-        initialize();
+        getAllData();
         System.out.println("Ready.");
-    }
-
-    public void initialize() throws Exception {
-
     }
 
     public String getSerialData(String inputMsg) throws Exception {
@@ -27,7 +23,7 @@ public class GardenSerialCommChannel {
         channel.sendMsg(inputMsg);
     }
 
-    public void update() throws Exception {
-
+    public void getAllData() throws Exception {
+        getSerialData("led1")
     }
 }

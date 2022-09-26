@@ -1,0 +1,21 @@
+#ifndef __CONTROLLERTASK__
+#define __CONTROLLERTASK__
+
+#include <Arduino.h>
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include "ServoTimer2.h"
+#include "Task.h"
+
+class ControllerTask: public Task {
+
+    enum {AUTO, MANUAL, ALARM} state;
+    int periodCounter = 0;
+    
+    public:
+        ControllerTask();
+        void init(int period);
+        void tick();
+};
+
+#endif
