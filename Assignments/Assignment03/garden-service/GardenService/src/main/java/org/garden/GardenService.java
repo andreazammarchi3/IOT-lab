@@ -4,9 +4,13 @@ import java.io.*;
 import java.net.*;
 
 public class GardenService {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
+        // Initialize the Socket Server
         ServerSocket server = new ServerSocket(888);
         System.out.println("Listening for connection on port 888 ....");
+
+        // Initialize the Serial Communication with Arduino
+        GardenSerialCommChannel gardenSerialCommChannel = new GardenSerialCommChannel();
 
         int l = 8;
         int t = 5;
@@ -17,7 +21,6 @@ public class GardenService {
             InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
             BufferedReader reader = new BufferedReader(isr);
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
-
             String line = reader.readLine();
             while (!line.isEmpty()) {
                 if (line.equals("data")) {
