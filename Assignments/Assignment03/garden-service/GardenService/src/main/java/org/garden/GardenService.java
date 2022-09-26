@@ -4,47 +4,27 @@ import java.io.*;
 import java.net.*;
 
 public class GardenService {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        // create server
-        ServerSocket ss = new ServerSocket(888);
-
-        // connect it to client socket
-        Socket s = ss.accept();
-        System.out.println("Connection to the client socket established");
-
-        // to send data to the client
-        PrintStream ps = new PrintStream(s.getOutputStream());
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(888);
+        System.out.println("Listening for connection on port 888 ....");
 
         int l = 8;
         int t = 5;
-        boolean even = false;
-        String msg = "";
+        while (true) {
+            Socket clientSocket = server.accept();
+            InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
+            BufferedReader reader = new BufferedReader(isr);
+            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
 
-        while(s.isConnected()) {
-            long millis = System.currentTimeMillis();
-
-            try {
-                if (even) {
-                    msg = "l: " + l;
-                    even = false;
-                    l++;
-                } else {
-                    even = true;
-                    msg = "t: " + t;
-                    t++;
+            String line = reader.readLine();
+            while (!line.isEmpty()) {
+                if (line.equals("l, t")) {
+                    System.out.println(line);
+                    writer.println(l + ", " + t);
                 }
-                ps.println(msg);
-            } catch (Exception e) {
-                System.out.println("ERROR");
-                ps.println("ERROR");
+                line = reader.readLine();
             }
-
-            Thread.sleep(1000 - millis % 1000);
         }
 
-        ps.close();
-        ss.close();
-        s.close();
-        System.out.println("Server and client CLOSED");
     }
 }
