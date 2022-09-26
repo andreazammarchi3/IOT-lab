@@ -15,7 +15,7 @@ void MsgTask::tick() {
     if (MsgService.isMsgAvailable()){
           Msg* msg = MsgService.receiveMsg();    
           if (msg->getContent() == "led1"){
-              MsgService.sendMsg(led1);
+              MsgService.sendMsg(String(led1));
            } else if (msg->getContent() == "led2"){
               MsgService.sendMsg(String(led2)); 
            } else if (msg->getContent() == "led3"){

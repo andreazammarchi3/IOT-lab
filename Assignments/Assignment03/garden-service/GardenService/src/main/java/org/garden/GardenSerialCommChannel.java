@@ -6,11 +6,16 @@ public class GardenSerialCommChannel {
      */
     private SerialCommChannel channel;
 
+    private int luminosity = 0;
+    private int temperature = 0;
+    private int[] lights = {0,0,0,0};
+    private int irrigation = 0;
+
     public GardenSerialCommChannel() throws Exception {
         channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
-        getAllData();
+        update();
         System.out.println("Ready.");
     }
 
@@ -23,7 +28,29 @@ public class GardenSerialCommChannel {
         channel.sendMsg(inputMsg);
     }
 
-    public void getAllData() throws Exception {
-        getSerialData("led1")
+    public void update() throws Exception {
+        // luminosity = Integer.parseInt(getSerialData("luminosity"));
+        // temperature = Integer.parseInt(getSerialData("temperature"));
+        lights[0] = Integer.parseInt(getSerialData("led1"));
+        lights[1] = Integer.parseInt(getSerialData("led2"));
+        lights[2] = Integer.parseInt(getSerialData("led3"));
+        lights[3] = Integer.parseInt(getSerialData("led4"));
+        irrigation = Integer.parseInt(getSerialData("irrigation"));
+    }
+
+    public int getIrrigation() {
+        return irrigation;
+    }
+
+    public int getLights(int i) {
+        return lights[i];
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public int getLuminosity() {
+        return luminosity;
     }
 }

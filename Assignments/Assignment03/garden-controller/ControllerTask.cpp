@@ -8,6 +8,12 @@ extern int LED3_PIN;
 extern int LED4_PIN;
 extern int SERVO_PIN;
 
+extern int led1;
+extern int led2;
+extern int led3;
+extern int led4;
+extern int irrigation;
+
 extern int MSG_TASK_PERIOD;
 extern int CONTROLLER_TASK_PERIOD;
 
@@ -15,8 +21,6 @@ ServoTimer2 servo;
 
 // Constructor
 ControllerTask::ControllerTask() {
-    lcd.init();
-    lcd.backlight();
     pinMode(LED1_PIN, OUTPUT);
     pinMode(LED2_PIN, OUTPUT);
     pinMode(LED3_PIN, OUTPUT);
@@ -37,8 +41,12 @@ void ControllerTask::tick() {
         // AUTO state
         case AUTO:
             if (periodCounter == 0) {
-                
-            } else if (periodCounter >= 20) {
+                digitalWrite(LED1_PIN, led1);
+                digitalWrite(LED2_PIN, led2);
+                digitalWrite(LED3_PIN, led3);
+                digitalWrite(LED4_PIN, led4);
+                servo.write(750);
+            } else {
                 
             }
             periodCounter++;
