@@ -5,9 +5,6 @@ public class GardenSerialCommChannel {
      * Serial Communication Channel
      */
     private SerialCommChannel channel;
-
-    private int luminosity = 0;
-    private int temperature = 0;
     private int[] lights = {0,0,0,0};
     private int irrigation = 0;
 
@@ -29,8 +26,6 @@ public class GardenSerialCommChannel {
     }
 
     public void update() throws Exception {
-        // luminosity = Integer.parseInt(getSerialData("luminosity"));
-        // temperature = Integer.parseInt(getSerialData("temperature"));
         lights[0] = Integer.parseInt(getSerialData("led1"));
         lights[1] = Integer.parseInt(getSerialData("led2"));
         lights[2] = Integer.parseInt(getSerialData("led3"));
@@ -44,13 +39,5 @@ public class GardenSerialCommChannel {
 
     public int getLights(int i) {
         return lights[i];
-    }
-
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public int getLuminosity() {
-        return luminosity;
     }
 }

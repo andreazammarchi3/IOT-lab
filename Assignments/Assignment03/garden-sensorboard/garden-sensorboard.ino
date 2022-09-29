@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <String.h>
 #define MSG_BUFFER_SIZE  50
 
 //variabili globali
@@ -107,9 +108,9 @@ void reconnect() {
 
 int getTemp() {
   tempVal = analogRead(tempPin);
-  temp = map(temp, 0, 4096, 1, 8);
-  temp = int(temp);
-  return temp;
+  tempVal = map(tempVal, 0, 4096, 1, 8);
+  tempVal = int(tempVal);
+  return tempVal;
 }
 
 int getLight() {
@@ -148,17 +149,16 @@ void loop()
     value++;
 
     /* Publishing the temperature */
-    char tempString[8];
+    char tempString[2];
     dtostrf(getTemp(), 1, 0, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    client.publish("SmartGarden/temperature", tempString);
-
-    /* Publishing the luminosity*/
-    char lightString[8];
+    char lightString[2];
     dtostrf(getLight(), 1, 0, lightString);
-    Serial.print("Luminosity: ");
-    Serial.println(lightString);
-    client.publish("SmartGarden/luminosity", lightString);
+    char msg[10];
+    strcpy(msg, tempString);
+    strcat(msg, ", ");
+    strcat(msg, lightString);
+    Serial.print("Temperature, Luminosity: ");
+    Serial.println(msg);
+    client.publish("SmartGarden/data", msg);
   }
 }

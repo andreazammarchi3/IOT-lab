@@ -1,10 +1,16 @@
 package org.garden;
 
-import java.io.*;
-import java.net.*;
+import io.vertx.core.Vertx;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class GardenService {
     private static GardenSerialCommChannel gardenSerialCommChannel;
+    private static MQTTAgent agent;
     private static int luminosity = 8;
     private static int temperature = 5;
     private static int[] lights = {1,1,2,2};
@@ -18,6 +24,11 @@ public class GardenService {
         // Initialize the Serial Communication with Arduino
         gardenSerialCommChannel = new GardenSerialCommChannel();
 
+        // Initialize the MQTT Agent
+        Vertx vertx = Vertx.vertx();
+        agent = new MQTTAgent();
+        vertx.deployVerticle(agent);
+
         while (true) {
             Socket clientSocket = server.accept();
             InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
@@ -25,8 +36,13 @@ public class GardenService {
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
             String line = reader.readLine();
             while (!line.isEmpty()) {
+                // If dashboard is requesting data
                 if (line.equals("data")) {
+                    // Get data from controller
                     getDataFromController();
+                    // Get data from sensor board
+                    getDataFromSensorboard();
+                    // Send data to dashboard
                     writer.println(
                             luminosity + ", " +
                             temperature + ", " +
@@ -42,11 +58,14 @@ public class GardenService {
     }
 
     private static void getDataFromController() {
-        // luminosity = gardenSerialCommChannel.getLuminosity();
-        // temperature = gardenSerialCommChannel.getTemperature();
         for (int i = 0; i < 4; i++) {
             lights[i] = gardenSerialCommChannel.getLights(i);
         }
         irrigation = gardenSerialCommChannel.getIrrigation();
+    }
+
+    private static void getDataFromSensorboard() {
+        luminosity = agent.getLuminosity();
+        temperature = agent.getTemperature();
     }
 }
