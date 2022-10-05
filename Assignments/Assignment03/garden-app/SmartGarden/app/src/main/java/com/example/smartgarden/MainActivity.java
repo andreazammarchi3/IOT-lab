@@ -19,17 +19,21 @@ public class MainActivity extends AppCompatActivity {
     public boolean irrMode = false;
     public int irrCounter = 0;
 
-    private TextView led3CounterText = findViewById(R.id.led_3_counter);
+    public TextView led3CounterText;
 
-    private TextView led4CounterText = findViewById(R.id.led_4_counter);
+    public TextView led4CounterText;
 
-    private TextView irrCounterText = findViewById(R.id.irrigation_counter);
+    public TextView irrCounterText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        led3CounterText = findViewById(R.id.led_3_counter);
+        led4CounterText = findViewById(R.id.led_4_counter);
+        irrCounterText = findViewById(R.id.irrigation_counter);
 
         Button buttonRequireManualControl = findViewById(R.id.button_require_manual_control);
         buttonRequireManualControl.setOnClickListener(view ->
@@ -38,47 +42,47 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonLed1 = findViewById(R.id.button_led_1);
         buttonLed1.setOnClickListener(view ->
-                boolBtnClick(led1Bool)
+                toggleLed1()
         );
 
         Button buttonLed2 = findViewById(R.id.button_led_2);
         buttonLed2.setOnClickListener(view ->
-                boolBtnClick(led2Bool)
+                toggleLed2()
         );
 
         Button buttonLed3Plus = findViewById(R.id.button_led_3_plus);
         buttonLed3Plus.setOnClickListener(view ->
-                counterBtnClick(led3Counter, led3CounterText, true)
+                incLed3()
         );
 
         Button buttonLed3Minus = findViewById(R.id.button_led_3_minus);
         buttonLed3Minus.setOnClickListener(view ->
-                counterBtnClick(led3Counter, led3CounterText, false)
+                decLed3()
         );
 
         Button buttonLed4Plus = findViewById(R.id.button_led_4_plus);
         buttonLed4Plus.setOnClickListener(view ->
-                counterBtnClick(led4Counter, led4CounterText, true)
+                incLed4()
         );
 
         Button buttonLed4Minus = findViewById(R.id.button_led_4_minus);
         buttonLed4Minus.setOnClickListener(view ->
-                counterBtnClick(led4Counter, led4CounterText, false)
+                decLed4()
         );
 
         Button buttonIrrigationMinus = findViewById(R.id.button_irrigation_minus);
         buttonIrrigationMinus.setOnClickListener(view ->
-                counterBtnClick(irrCounter, irrCounterText, false)
+                decIrr()
         );
 
         Button buttonIrrigationPlus = findViewById(R.id.button_irrigation_plus);
         buttonIrrigationPlus.setOnClickListener(view ->
-                counterBtnClick(irrCounter, irrCounterText, true)
+                incIrr()
         );
 
         Button buttonIrrigation = findViewById(R.id.button_irrigation);
         buttonIrrigation.setOnClickListener(view ->
-                boolBtnClick(irrMode)
+                toggleIrr()
         );
     }
 
@@ -96,23 +100,57 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void boolBtnClick(boolean bool) {
-        bool = !bool;
-    }
-
-    private void counterBtnClick(int counter, TextView view, boolean sum) {
-        if(counter<4 && sum) {
-            counter++;
-        } else if(counter>0 && !sum) {
-            counter--;
+    private void incLed3() {
+        if (led3Counter < 4) {
+            led3Counter++;
         }
-        view.setText(counter);
+        led3CounterText.setText(String.valueOf(led3Counter));
     }
 
-    private void led4PlusClick() {
-        if(led4Counter<4) {
+    private void incLed4() {
+        if (led4Counter < 4) {
             led4Counter++;
         }
-        led4CounterText.setText(led4Counter);
+        led4CounterText.setText(String.valueOf(led4Counter));
+    }
+
+    private void incIrr() {
+        if (irrCounter < 4) {
+            irrCounter++;
+        }
+        irrCounterText.setText(String.valueOf(irrCounter));
+    }
+
+    private void decLed3() {
+        if (led3Counter > 0) {
+            led3Counter--;
+        }
+        led3CounterText.setText(String.valueOf(led3Counter));
+    }
+
+    private void decLed4() {
+        if (led4Counter > 0) {
+            led4Counter--;
+        }
+        led4CounterText.setText(String.valueOf(led4Counter));
+    }
+
+    private void decIrr() {
+        if (irrCounter > 0) {
+            irrCounter--;
+        }
+        irrCounterText.setText(String.valueOf(irrCounter));
+    }
+
+    private void toggleLed1() {
+        led1Bool = !led1Bool;
+    }
+
+    private void toggleLed2() {
+        led2Bool = !led2Bool;
+    }
+
+    private void toggleIrr() {
+        irrMode = !irrMode;
     }
 }
