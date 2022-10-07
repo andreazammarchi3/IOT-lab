@@ -7,6 +7,7 @@ public class GardenSerialCommChannel {
     private SerialCommChannel channel;
     private int[] lights = {0,0,0,0};
     private int irrigation = 0;
+    private int mode = 0;
 
     public GardenSerialCommChannel() throws Exception {
         channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
@@ -31,6 +32,7 @@ public class GardenSerialCommChannel {
         lights[2] = Integer.parseInt(getSerialData("led3"));
         lights[3] = Integer.parseInt(getSerialData("led4"));
         irrigation = Integer.parseInt(getSerialData("irrigation"));
+        mode = Integer.parseInt(getSerialData("mode"));
     }
 
     public int getIrrigation() {
@@ -40,4 +42,6 @@ public class GardenSerialCommChannel {
     public int getLights(int i) {
         return lights[i];
     }
+
+    public int getMode() { return mode; }
 }

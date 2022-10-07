@@ -4,6 +4,7 @@
 #include <String.h>
 #include "Task.h"
 #include "MsgService.h"
+#include "MsgServiceBT.h"
 
 class MsgTask: public Task {
     public:

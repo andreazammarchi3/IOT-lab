@@ -15,6 +15,7 @@ public class GardenService {
     private static int temperature = 5;
     private static int[] lights = {1,1,2,2};
     private static int irrigation = 1;
+    private static int mode = 0;
 
     public static void main(String[] args) throws Exception {
         // Initialize the Socket Server
@@ -50,7 +51,8 @@ public class GardenService {
                             lights[1] + ", " +
                             lights[2] + ", " +
                             lights[3] + ", " +
-                            irrigation);
+                            irrigation + ", " +
+                            mode);
                 }
                 line = reader.readLine();
             }
@@ -62,6 +64,7 @@ public class GardenService {
             lights[i] = gardenSerialCommChannel.getLights(i);
         }
         irrigation = gardenSerialCommChannel.getIrrigation();
+        mode = gardenSerialCommChannel.getMode();
     }
 
     private static void getDataFromSensorboard() {

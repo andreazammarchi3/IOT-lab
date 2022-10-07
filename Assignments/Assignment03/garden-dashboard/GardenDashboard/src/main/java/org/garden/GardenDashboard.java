@@ -14,6 +14,7 @@ public class GardenDashboard {
     static int temperature;
     static int[] lights = new int[4];
     static int irrigation;
+    static int mode;
     public static void main(String[] args) throws Exception {
         Socket clientSocket = new Socket("localhost", 888);
         BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -47,6 +48,7 @@ public class GardenDashboard {
         lights[2] = Integer.parseInt(items.get(4));
         lights[3] = Integer.parseInt(items.get(5));
         irrigation = Integer.parseInt(items.get(6));
+        mode = Integer.parseInt(items.get(7));
     }
 
     private static void updateGUI() {
@@ -57,5 +59,6 @@ public class GardenDashboard {
         gui.updateLed3(lights[2]);
         gui.updateLed4(lights[3]);
         gui.updateIrrigation(irrigation);
+        gui.updateMode(mode);
     }
 }

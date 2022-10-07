@@ -18,6 +18,7 @@ extern int MSG_TASK_PERIOD;
 extern int CONTROLLER_TASK_PERIOD;
 
 ServoTimer2 servo;
+extern MsgServiceBT msgServiceBT;
 
 // Constructor
 ControllerTask::ControllerTask() {
@@ -47,7 +48,7 @@ void ControllerTask::tick() {
                 digitalWrite(LED4_PIN, led4);
                 servo.write(750);
             } else {
-                
+              
             }
             periodCounter++;
             break;

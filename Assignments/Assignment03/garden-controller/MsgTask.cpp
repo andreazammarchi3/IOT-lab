@@ -5,10 +5,12 @@ extern int led2;
 extern int led3;
 extern int led4;
 extern int irrigation;
+extern int mode;
 
 void MsgTask::init(int period) {
     Task::init(period);
     MsgService.init();
+    MsgServiceBT.init();
 }
 
 void MsgTask::tick() {
@@ -24,6 +26,8 @@ void MsgTask::tick() {
               MsgService.sendMsg(String(led4));
            } else if (msg->getContent() == "irrigation"){
               MsgService.sendMsg(String(irrigation));
+           } else if (msg->getContent() == "mode"){
+              MsgService.sendMsg(String(mode));
            }
           delete msg;
         }

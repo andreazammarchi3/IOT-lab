@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GardenDashboardGUI {
+
     JLabel textAreaL = new JLabel("Luminosity: ");
     JLabel textAreaT = new JLabel("Temperature: ");
     JLabel textAreaLed1 = new JLabel("Led1: ");
@@ -11,6 +12,8 @@ public class GardenDashboardGUI {
     JLabel textAreaLed3 = new JLabel("Led3: ");
     JLabel textAreaLed4 = new JLabel("Led4: ");
     JLabel textAreaIrrigation = new JLabel("Irrigation: ");
+    JLabel textAreaMode = new JLabel("Mode: ");
+
     public GardenDashboardGUI() {
         JFrame mainFrame = new JFrame("GardenDashboard");
         mainFrame.setSize(300, 300);
@@ -26,6 +29,7 @@ public class GardenDashboardGUI {
         panel.add(textAreaLed3);
         panel.add(textAreaLed4);
         panel.add(textAreaIrrigation);
+        panel.add(textAreaMode);
 
         mainFrame.setVisible(true);
     }
@@ -56,5 +60,17 @@ public class GardenDashboardGUI {
 
     public void updateIrrigation(int value) {
         textAreaIrrigation.setText("Irrigation: " + value);
+    }
+
+    public void updateMode(int value) {
+        String mode;
+        if (value == 0) {
+            mode = "AUTO";
+        } else if (value == 1) {
+            mode = "MANUAL";
+        } else {
+            mode = "ALARM";
+        }
+        textAreaMode.setText("Mode: " + mode);
     }
 }

@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean led2Bool = false;
     public int led3Counter = 0;
     public int led4Counter = 0;
-    public String mode = "AUTO";
+    public int mode = 0;
     public boolean irrMode = false;
     public int irrCounter = 0;
 
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonRequireManualControl = findViewById(R.id.button_require_manual_control);
         buttonRequireManualControl.setOnClickListener(view ->
-                System.out.println("Required MANUAL control")
+                requireManualControl()
         );
 
         Button buttonLed1 = findViewById(R.id.button_led_1);
@@ -84,6 +84,16 @@ public class MainActivity extends AppCompatActivity {
         buttonIrrigation.setOnClickListener(view ->
                 toggleIrr()
         );
+
+        buttonLed1.setEnabled(false);
+        buttonLed2.setEnabled(false);
+        buttonLed3Minus.setEnabled(false);
+        buttonLed3Plus.setEnabled(false);
+        buttonLed4Minus.setEnabled(false);
+        buttonLed4Plus.setEnabled(false);
+        buttonIrrigation.setEnabled(false);
+        buttonIrrigationMinus.setEnabled(false);
+        buttonIrrigationPlus.setEnabled(false);
     }
 
     @Override
@@ -152,5 +162,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleIrr() {
         irrMode = !irrMode;
+    }
+
+    private void requireManualControl() {
+        System.out.println("Required MANUAL control");
+        
     }
 }
