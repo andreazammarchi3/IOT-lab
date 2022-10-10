@@ -10,7 +10,6 @@ extern int mode;
 void MsgTask::init(int period) {
     Task::init(period);
     MsgService.init();
-    MsgServiceBT.init();
 }
 
 void MsgTask::tick() {

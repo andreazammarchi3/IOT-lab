@@ -16,12 +16,7 @@ public:
   }
 };
 
-class Pattern {
-public:
-  virtual boolean match(const Msg& m) = 0;  
-};
-
-class MsgServiceClass {
+class MsgServiceSerial {
     
 public: 
   
@@ -33,13 +28,25 @@ public:
   bool isMsgAvailable();
   Msg* receiveMsg();
 
-  bool isMsgAvailable(Pattern& pattern);
-  Msg* receiveMsg(Pattern& pattern);
-  
-  void sendMsg(const Msg& msg);
   void sendMsg(const String& msg);
 };
 
-extern MsgServiceClass MsgService;
+class MsgServiceBluetooth {
+    
+public: 
+
+  Msg* currentMsg;
+  bool msgAvailable;
+
+  void init();  
+
+  bool isMsgAvailable();
+  Msg* receiveMsg();  
+ 
+  void sendMsg(const String& msg);
+};
+
+extern MsgServiceSerial MsgService;
+extern MsgServiceBluetooth MsgServiceBT;
 
 #endif

@@ -9,25 +9,38 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.smartgarden.utils.CommChannel;
+import com.example.smartgarden.utils.ExtendedSerialCommChannel;
+import com.example.smartgarden.utils.SerialCommChannel;
+
 public class MainActivity extends AppCompatActivity {
 
-    public boolean led1Bool = false;
-    public boolean led2Bool = false;
-    public int led3Counter = 0;
-    public int led4Counter = 0;
-    public int mode = 0;
-    public boolean irrMode = false;
-    public int irrCounter = 0;
+    private boolean led1Bool = false;
+    private boolean led2Bool = false;
+    private int led3Counter = 0;
+    private int led4Counter = 0;
+    private int mode = 0;
+    private boolean irrMode = false;
+    private int irrCounter = 0;
 
-    public TextView led3CounterText;
+    private TextView led3CounterText;
+    private TextView led4CounterText;
+    private TextView irrCounterText;
 
-    public TextView led4CounterText;
+    private Button buttonLed1;
+    private Button buttonLed2;
+    private Button buttonLed3Plus;
+    private Button buttonLed3Minus;
+    private Button buttonLed4Plus;
+    private Button buttonLed4Minus;
+    private Button buttonIrrigationMinus;
+    private Button buttonIrrigationPlus;
+    private Button buttonIrrigation;
 
-    public TextView irrCounterText;
+    CommChannel channel;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -37,63 +50,61 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonRequireManualControl = findViewById(R.id.button_require_manual_control);
         buttonRequireManualControl.setOnClickListener(view ->
-                requireManualControl()
+                {
+                    try {
+                        requireManualControl();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
         );
 
-        Button buttonLed1 = findViewById(R.id.button_led_1);
+        buttonLed1 = findViewById(R.id.button_led_1);
         buttonLed1.setOnClickListener(view ->
                 toggleLed1()
         );
 
-        Button buttonLed2 = findViewById(R.id.button_led_2);
+        buttonLed2 = findViewById(R.id.button_led_2);
         buttonLed2.setOnClickListener(view ->
                 toggleLed2()
         );
 
-        Button buttonLed3Plus = findViewById(R.id.button_led_3_plus);
+        buttonLed3Plus = findViewById(R.id.button_led_3_plus);
         buttonLed3Plus.setOnClickListener(view ->
                 incLed3()
         );
 
-        Button buttonLed3Minus = findViewById(R.id.button_led_3_minus);
+        buttonLed3Minus = findViewById(R.id.button_led_3_minus);
         buttonLed3Minus.setOnClickListener(view ->
                 decLed3()
         );
 
-        Button buttonLed4Plus = findViewById(R.id.button_led_4_plus);
+        buttonLed4Plus = findViewById(R.id.button_led_4_plus);
         buttonLed4Plus.setOnClickListener(view ->
                 incLed4()
         );
 
-        Button buttonLed4Minus = findViewById(R.id.button_led_4_minus);
+        buttonLed4Minus = findViewById(R.id.button_led_4_minus);
         buttonLed4Minus.setOnClickListener(view ->
                 decLed4()
         );
 
-        Button buttonIrrigationMinus = findViewById(R.id.button_irrigation_minus);
+        buttonIrrigationMinus = findViewById(R.id.button_irrigation_minus);
         buttonIrrigationMinus.setOnClickListener(view ->
                 decIrr()
         );
 
-        Button buttonIrrigationPlus = findViewById(R.id.button_irrigation_plus);
+        buttonIrrigationPlus = findViewById(R.id.button_irrigation_plus);
         buttonIrrigationPlus.setOnClickListener(view ->
                 incIrr()
         );
 
-        Button buttonIrrigation = findViewById(R.id.button_irrigation);
+        buttonIrrigation = findViewById(R.id.button_irrigation);
         buttonIrrigation.setOnClickListener(view ->
                 toggleIrr()
         );
 
-        buttonLed1.setEnabled(false);
-        buttonLed2.setEnabled(false);
-        buttonLed3Minus.setEnabled(false);
-        buttonLed3Plus.setEnabled(false);
-        buttonLed4Minus.setEnabled(false);
-        buttonLed4Plus.setEnabled(false);
-        buttonIrrigation.setEnabled(false);
-        buttonIrrigationMinus.setEnabled(false);
-        buttonIrrigationPlus.setEnabled(false);
+        setEnabledAllBtns(false);
     }
 
     @Override
@@ -105,14 +116,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_alarm) {
-            System.out.println("Alarm btn clicked");
+            if (mode != 0) {
+                System.out.println("Alarm btn clicked");
+                channel.sendMsg("AUTO");
+                mode = 0;
+            }
         }
         return true;
+    }
+
+    private void setEnabledAllBtns(Boolean state) {
+        buttonLed1.setEnabled(state);
+        buttonLed2.setEnabled(state);
+        buttonLed3Minus.setEnabled(state);
+        buttonLed3Plus.setEnabled(state);
+        buttonLed4Minus.setEnabled(state);
+        buttonLed4Plus.setEnabled(state);
+        buttonIrrigation.setEnabled(state);
+        buttonIrrigationMinus.setEnabled(state);
+        buttonIrrigationPlus.setEnabled(state);
+
     }
 
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
+            channel.sendMsg("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -120,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
+            channel.sendMsg("Led4_" + led4Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -127,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
+            channel.sendMsg("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -134,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
+            channel.sendMsg("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -141,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
+            channel.sendMsg("Led4_" + led3Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -148,24 +181,54 @@ public class MainActivity extends AppCompatActivity {
     private void decIrr() {
         if (irrCounter > 0) {
             irrCounter--;
+            channel.sendMsg("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
 
     private void toggleLed1() {
-        led1Bool = !led1Bool;
+        if (led1Bool) {
+            led1Bool = false;
+            channel.sendMsg("Led1_OFF");
+        } else {
+            led1Bool = true;
+            channel.sendMsg("Led1_ON");
+        }
     }
 
     private void toggleLed2() {
-        led2Bool = !led2Bool;
+        if (led2Bool) {
+            led2Bool = false;
+            channel.sendMsg("Led2_OFF");
+        } else {
+            led2Bool = true;
+            channel.sendMsg("Led2_ON");
+        }
     }
 
     private void toggleIrr() {
-        irrMode = !irrMode;
+        if (irrMode) {
+            irrMode = false;
+            channel.sendMsg("irr_CLOSE");
+        } else {
+            irrMode = true;
+            channel.sendMsg("irr_OPEN");
+        }
     }
 
-    private void requireManualControl() {
+    private void requireManualControl() throws InterruptedException {
         System.out.println("Required MANUAL control");
-        
+        try {
+            channel = new ExtendedSerialCommChannel("/dev/cu.DSDTECHHC-05",9600);
+            channel.sendMsg("MANUAL");
+            String msg = channel.receiveMsg();
+            System.out.println(msg);
+            mode = 1;
+            setEnabledAllBtns(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
 }

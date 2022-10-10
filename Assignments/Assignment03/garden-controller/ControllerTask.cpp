@@ -1,4 +1,5 @@
 #include "ControllerTask.h"
+#include <SoftwareSerial.h>
 
 // Importing external vars declared in the .ino file
 
@@ -17,8 +18,9 @@ extern int irrigation;
 extern int MSG_TASK_PERIOD;
 extern int CONTROLLER_TASK_PERIOD;
 
+extern SoftwareSerial channel;
+
 ServoTimer2 servo;
-extern MsgServiceBT msgServiceBT;
 
 // Constructor
 ControllerTask::ControllerTask() {
@@ -48,14 +50,28 @@ void ControllerTask::tick() {
                 digitalWrite(LED4_PIN, led4);
                 servo.write(750);
             } else {
-              
+                if (channel.available()) {
+                    char msg= (char) channel.read();
+                    if (msg == 'MANUAL'){
+                        state = MANUAL;
+                        channel.println("ok");
+                        periodCounter = 0;
+                    }
+                }
             }
             periodCounter++;
             break;
 
         // MANUAL state: waiting for user input
         case MANUAL:
-            
+            if (channel.available()) {
+                    char msg= (char) channel.read();
+                    if (msg == 'Led1_ON'){
+                        digitalWrite(led1, HIGH);
+                    } else if (msg == 'Led1_OFF'){
+                        digitalWrite(led1, LOW);
+                    }
+                }
             periodCounter++;
             break;
 

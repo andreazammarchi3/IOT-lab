@@ -3,14 +3,13 @@
 #include "Scheduler.h"
 #include "MsgTask.h"
 #include "ControllerTask.h"
-#include "MsgServiceBT.h"
 
 #define SCHED_PERIOD 100
 
 const int RxD = 2;
 const int TxD = 3;
 
-MsgServiceBT msgServiceBT(2,3);
+SoftwareSerial channel(RxD, TxD);
 
 Scheduler sched;
 
@@ -37,6 +36,9 @@ void setup()
 { 
   pinMode(RxD, INPUT);
   pinMode(TxD, OUTPUT);
+
+  channel.begin(9600);
+  while (!Serial){}
 
   // Scheduler initialization, period = 100ms
   sched.init(SCHED_PERIOD);
