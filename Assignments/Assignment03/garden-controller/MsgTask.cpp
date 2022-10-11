@@ -42,6 +42,9 @@ void MsgTask::tick() {
       digitalWrite(LED1_PIN, LOW);
     } else if (msg1->getContent() == "MANUAL") {
       mode = 1;
+    } else {
+      Serial.begin(19200);
+      Serial.print(msg1->getContent());
     }
   }
         

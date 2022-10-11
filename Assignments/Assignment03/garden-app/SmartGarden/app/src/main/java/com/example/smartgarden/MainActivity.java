@@ -2,24 +2,25 @@ package com.example.smartgarden;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
-
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.example.smartgarden.utils.Bluetooth;
+import com.example.smartgarden.utils.BluetoothChannel;
+import com.example.smartgarden.utils.BluetoothUtils;
+import com.example.smartgarden.utils.ConnectToBluetoothServerTask;
+import com.example.smartgarden.utils.ConnectionTask;
+import com.example.smartgarden.utils.RealBluetoothChannel;
+
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,11 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private int mode = 0;
     private boolean irrMode = false;
     private int irrCounter = 0;
+    private boolean btActive = false;
 
+    // GUI
     private TextView led3CounterText;
     private TextView led4CounterText;
     private TextView irrCounterText;
-
     private Button buttonLed1;
     private Button buttonLed2;
     private Button buttonLed3Plus;
@@ -45,16 +47,12 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonIrrigationMinus;
     private Button buttonIrrigationPlus;
     private Button buttonIrrigation;
+    private Button buttonRequireManualControl;
 
-    // bluetooth
-    public UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    // Bluetooth
+    private BluetoothChannel btChannel;
 
-    BluetoothAdapter mBluetoothAdapter = null;
-    BluetoothSocket mmSocket = null;
-    BluetoothDevice mmDevice = null;
-    OutputStream outStream;
-    InputStream inStream;
-
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +62,12 @@ public class MainActivity extends AppCompatActivity {
         led4CounterText = findViewById(R.id.led_4_counter);
         irrCounterText = findViewById(R.id.irrigation_counter);
 
-        Button buttonRequireManualControl = findViewById(R.id.button_require_manual_control);
+        buttonRequireManualControl = (Button)findViewById(R.id.button_require_manual_control);
         buttonRequireManualControl.setOnClickListener(view ->
                 {
                     try {
-                        requireManualControl();
-                    } catch (InterruptedException | IOException e) {
+                        toggleBT();
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -121,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
         );
 
         setEnabledAllBtns(false);
+
+        // Bluetooth init
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(btAdapter != null && !btAdapter.isEnabled()){
+            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), Bluetooth.bluetooth.ENABLE_BT_REQUEST);
+        }
     }
 
     @Override
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_alarm) {
             if (mode != 0) {
                 System.out.println("Alarm btn clicked");
-                sendMsg("AUTO");
+                btChannel.sendMessage("AUTO");
                 mode = 0;
             }
         }
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
-            sendMsg("Led3_" + led3Counter);
+            btChannel.sendMessage("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
-            sendMsg("Led4_" + led4Counter);
+            btChannel.sendMessage("Led4_" + led4Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -173,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
-            sendMsg("irr_" + irrCounter);
+            btChannel.sendMessage("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -181,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
-            sendMsg("Led3_" + led3Counter);
+            btChannel.sendMessage("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -189,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
-            sendMsg("Led4_" + led3Counter);
+            btChannel.sendMessage("Led4_" + led3Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -197,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     private void decIrr() {
         if (irrCounter > 0) {
             irrCounter--;
-            sendMsg("irr_" + irrCounter);
+            btChannel.sendMessage("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -205,121 +209,90 @@ public class MainActivity extends AppCompatActivity {
     private void toggleLed1() {
         if (led1Bool) {
             led1Bool = false;
-            sendMsg("Led1_OFF");
+            btChannel.sendMessage("Led1_OFF");
         } else {
             led1Bool = true;
-            sendMsg("Led1_ON");
+            btChannel.sendMessage("Led1_ON");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            sendMsg("Led2_OFF");
+            btChannel.sendMessage("Led2_OFF");
         } else {
             led2Bool = true;
-            sendMsg("Led2_ON");
+            btChannel.sendMessage("Led2_ON");
         }
     }
 
     private void toggleIrr() {
         if (irrMode) {
             irrMode = false;
-            sendMsg("irr_CLOSE");
+            btChannel.sendMessage("irr_CLOSE");
         } else {
             irrMode = true;
-            sendMsg("irr_OPEN");
+            btChannel.sendMessage("irr_OPEN");
         }
     }
 
-    private void requireManualControl() throws InterruptedException, IOException {
+    private void requireManualControl() throws Exception {
         System.out.println("Required MANUAL control");
+        connectToBTServer();
+    }
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // IL BLUETOOTH NON E' SUPPORTATO
-            Toast.makeText(MainActivity.this, "BlueTooth non supportato", Toast.LENGTH_LONG).show();
-            // tgb.setChecked(false);
-        } else {
-            if (!mBluetoothAdapter.isEnabled()) { //controlla che sia abilitato il devices
-                //  NON E' ABILITATO IL BLUETOOTH
-                Toast.makeText(MainActivity.this, "BlueTooth non abilitato", Toast.LENGTH_LONG).show();
-                // tgb.setChecked(false);
-            } else {
-                //  IL BLUETOOTH E' ABILITATO
-                mmDevice = mBluetoothAdapter.getRemoteDevice("98:D3:31:20:44:12"); //MAC address del bluetooth di arduino
-                try {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
+    private void connectToBTServer() throws Exception  {
+        final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByAddress("98:D3:31:20:44:12");
+        // final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
+        final UUID uuid = BluetoothUtils.generateUuidFromString("00001101-0000-1000-8000-00805F9B34FB");
+
+        AsyncTask<Void, Void, Integer> execute = new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onConnectionActive(final BluetoothChannel channel) {
+                System.out.println("Status : connected to server on device " + serverDevice.getName());
+                btChannel = channel;
+                btChannel.sendMessage("MANUAL");
+                btChannel.registerListener(new RealBluetoothChannel.Listener() {
+                    @Override
+                    public void onMessageReceived(String receivedMessage) {
+                        System.out.printf("> [RECEIVED from %s] %s",
+                                btChannel.getRemoteDeviceName(),
+                                receivedMessage);
                     }
-                    mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-                }
-                catch (IOException e){
-                    // tgb.setChecked(false);
-                }
-                try{
-                    // CONNETTE IL DISPOSITIVO TRAMITE IL SOCKET mmSocket
-                    mmSocket.connect();
-                    if (mmSocket.isConnected()) {
-                        outStream = mmSocket.getOutputStream();
-                        inStream = mmSocket.getInputStream();
-                        Toast.makeText(MainActivity.this, "ON",  Toast.LENGTH_SHORT).show(); //bluetooth è connesso
-                        sendMsg("MANUAL");
-                        mode = 1;
-                        setEnabledAllBtns(true);
-                    } else {
-                        System.out.println("NOT CONNECTED");
+
+                    @Override
+                    public void onMessageSent(String sentMessage) {
+                        System.out.printf("> [SENT to %s] %s",
+                                btChannel.getRemoteDeviceName(),
+                                sentMessage);
                     }
-                }
-                catch (IOException closeException){
-                    //tgb.setChecked(false);
-                    try{
-                        //TENTA DI CHIUDERE IL SOCKET
-                        mmSocket.close();
-                    }
-                    catch (IOException ignored){
-                    }
-                    Toast.makeText(MainActivity.this, "connessione non riuscita",  Toast.LENGTH_SHORT).show();
-                }
+                });
             }
-        }
+
+            @Override
+            public void onConnectionCanceled() {
+                System.out.printf("Status : unable to connect, device %s not found!",
+                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
+            }
+        });
+        execute.execute();
     }
 
-    private void sendMsg(String message) {
-        if (outStream == null)
-        {
-            return;
-        }
-        byte[] msgBuffer = message.getBytes();
-        try
-        {
-            outStream.write(msgBuffer);
-        }
-        catch (IOException e)
-        {
-            Toast.makeText(MainActivity.this, "Messaggio non Inviato", Toast.LENGTH_SHORT).show();
-        }
-    }
+    @SuppressLint("SetTextI18n")
+    private void toggleBT() throws Exception {
+        if (!btActive) {
+            requireManualControl();
+            btActive = true;
+            buttonRequireManualControl.setText("Close BT connection");
+            setEnabledAllBtns(true);
+            mode = 1;
+        } else {
+            btActive = false;
 
-    private int receiveMsg() {
-        if (inStream == null)
-        {
-            return -1;
-        }
-        try
-        {
-            return inStream.read();
-        }
-        catch (IOException e)
-        {
-            Toast.makeText(MainActivity.this, "Messaggio non ricevuto", Toast.LENGTH_SHORT).show();
-            return -1;
+            buttonRequireManualControl.setText("Require manual control");
+            setEnabledAllBtns(false);
+            mode = 0;
         }
     }
 

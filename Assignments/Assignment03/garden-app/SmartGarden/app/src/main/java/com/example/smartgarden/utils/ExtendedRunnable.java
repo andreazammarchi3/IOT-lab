@@ -1,0 +1,6 @@
+package com.example.smartgarden.utils;
+
+public interface ExtendedRunnable extends Runnable {
+    void write(byte[] bytes);
+    void cancel();
+}
