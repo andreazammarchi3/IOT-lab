@@ -2,16 +2,25 @@ package com.example.smartgarden;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.smartgarden.utils.CommChannel;
-import com.example.smartgarden.utils.ExtendedSerialCommChannel;
-import com.example.smartgarden.utils.SerialCommChannel;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,7 +46,14 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonIrrigationPlus;
     private Button buttonIrrigation;
 
-    CommChannel channel;
+    // bluetooth
+    public UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    BluetoothAdapter mBluetoothAdapter = null;
+    BluetoothSocket mmSocket = null;
+    BluetoothDevice mmDevice = null;
+    OutputStream outStream;
+    InputStream inStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     try {
                         requireManualControl();
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -118,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_alarm) {
             if (mode != 0) {
                 System.out.println("Alarm btn clicked");
-                channel.sendMsg("AUTO");
+                sendMsg("AUTO");
                 mode = 0;
             }
         }
@@ -141,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
-            channel.sendMsg("Led3_" + led3Counter);
+            sendMsg("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -149,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
-            channel.sendMsg("Led4_" + led4Counter);
+            sendMsg("Led4_" + led4Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -157,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
-            channel.sendMsg("irr_" + irrCounter);
+            sendMsg("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -165,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
-            channel.sendMsg("Led3_" + led3Counter);
+            sendMsg("Led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -173,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
-            channel.sendMsg("Led4_" + led3Counter);
+            sendMsg("Led4_" + led3Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -181,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
     private void decIrr() {
         if (irrCounter > 0) {
             irrCounter--;
-            channel.sendMsg("irr_" + irrCounter);
+            sendMsg("irr_" + irrCounter);
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -189,44 +205,121 @@ public class MainActivity extends AppCompatActivity {
     private void toggleLed1() {
         if (led1Bool) {
             led1Bool = false;
-            channel.sendMsg("Led1_OFF");
+            sendMsg("Led1_OFF");
         } else {
             led1Bool = true;
-            channel.sendMsg("Led1_ON");
+            sendMsg("Led1_ON");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            channel.sendMsg("Led2_OFF");
+            sendMsg("Led2_OFF");
         } else {
             led2Bool = true;
-            channel.sendMsg("Led2_ON");
+            sendMsg("Led2_ON");
         }
     }
 
     private void toggleIrr() {
         if (irrMode) {
             irrMode = false;
-            channel.sendMsg("irr_CLOSE");
+            sendMsg("irr_CLOSE");
         } else {
             irrMode = true;
-            channel.sendMsg("irr_OPEN");
+            sendMsg("irr_OPEN");
         }
     }
 
-    private void requireManualControl() throws InterruptedException {
+    private void requireManualControl() throws InterruptedException, IOException {
         System.out.println("Required MANUAL control");
-        try {
-            channel = new ExtendedSerialCommChannel("/dev/cu.DSDTECHHC-05",9600);
-            channel.sendMsg("MANUAL");
-            String msg = channel.receiveMsg();
-            System.out.println(msg);
-            mode = 1;
-            setEnabledAllBtns(true);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // IL BLUETOOTH NON E' SUPPORTATO
+            Toast.makeText(MainActivity.this, "BlueTooth non supportato", Toast.LENGTH_LONG).show();
+            // tgb.setChecked(false);
+        } else {
+            if (!mBluetoothAdapter.isEnabled()) { //controlla che sia abilitato il devices
+                //  NON E' ABILITATO IL BLUETOOTH
+                Toast.makeText(MainActivity.this, "BlueTooth non abilitato", Toast.LENGTH_LONG).show();
+                // tgb.setChecked(false);
+            } else {
+                //  IL BLUETOOTH E' ABILITATO
+                mmDevice = mBluetoothAdapter.getRemoteDevice("98:D3:31:20:44:12"); //MAC address del bluetooth di arduino
+                try {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        System.out.println("Permission");
+                    }
+                    mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+                }
+                catch (IOException e){
+                    // tgb.setChecked(false);
+                }
+                try{
+                    // CONNETTE IL DISPOSITIVO TRAMITE IL SOCKET mmSocket
+                    mmSocket.connect();
+                    if (mmSocket.isConnected()) {
+                        outStream = mmSocket.getOutputStream();
+                        inStream = mmSocket.getInputStream();
+                        Toast.makeText(MainActivity.this, "ON",  Toast.LENGTH_SHORT).show(); //bluetooth è connesso
+                        mode = 1;
+                        setEnabledAllBtns(true);
+                    } else {
+                        System.out.println("NOT CONNECTED");
+                    }
+                }
+                catch (IOException closeException){
+                    //tgb.setChecked(false);
+                    try{
+                        //TENTA DI CHIUDERE IL SOCKET
+                        mmSocket.close();
+                    }
+                    catch (IOException ignored){
+                    }
+                    Toast.makeText(MainActivity.this, "connessione non riuscita",  Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private void sendMsg(String message) {
+        if (outStream == null)
+        {
+            return;
+        }
+        byte[] msgBuffer = message.getBytes();
+        try
+        {
+            outStream.write(msgBuffer);
+        }
+        catch (IOException e)
+        {
+            Toast.makeText(MainActivity.this, "Messaggio non Inviato", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private int receiveMsg() {
+        if (inStream == null)
+        {
+            return -1;
+        }
+        try
+        {
+            return inStream.read();
+        }
+        catch (IOException e)
+        {
+            Toast.makeText(MainActivity.this, "Messaggio non Inviato", Toast.LENGTH_SHORT).show();
+            return -1;
         }
     }
 
