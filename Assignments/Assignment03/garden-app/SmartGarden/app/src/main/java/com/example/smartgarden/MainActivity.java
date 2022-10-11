@@ -257,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                         //                                          int[] grantResults)
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
-                        System.out.println("Permission");
                     }
                     mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
                 }
@@ -271,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                         outStream = mmSocket.getOutputStream();
                         inStream = mmSocket.getInputStream();
                         Toast.makeText(MainActivity.this, "ON",  Toast.LENGTH_SHORT).show(); //bluetooth è connesso
+                        sendMsg("MANUAL");
                         mode = 1;
                         setEnabledAllBtns(true);
                     } else {
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (IOException e)
         {
-            Toast.makeText(MainActivity.this, "Messaggio non Inviato", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Messaggio non ricevuto", Toast.LENGTH_SHORT).show();
             return -1;
         }
     }

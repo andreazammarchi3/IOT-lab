@@ -1,24 +1,12 @@
 #include "ControllerTask.h"
 #include <SoftwareSerial.h>
 
-// Importing external vars declared in the .ino file
-
-extern int LED1_PIN;
-extern int LED2_PIN;
-extern int LED3_PIN;
-extern int LED4_PIN;
-extern int SERVO_PIN;
-
 extern int led1;
 extern int led2;
 extern int led3;
 extern int led4;
 extern int irrigation;
-
-extern int MSG_TASK_PERIOD;
-extern int CONTROLLER_TASK_PERIOD;
-
-extern SoftwareSerial channel;
+extern int mode;
 
 ServoTimer2 servo;
 
@@ -28,6 +16,8 @@ ControllerTask::ControllerTask() {
     pinMode(LED2_PIN, OUTPUT);
     pinMode(LED3_PIN, OUTPUT);
     pinMode(LED4_PIN, OUTPUT);
+    pinMode(Rx, INPUT);
+    pinMode(Tx, OUTPUT);
     servo.attach(SERVO_PIN);
 }
 
@@ -50,13 +40,9 @@ void ControllerTask::tick() {
                 digitalWrite(LED4_PIN, led4);
                 servo.write(750);
             } else {
-                if (channel.available()) {
-                    char msg= (char) channel.read();
-                    if (msg == 'MANUAL'){
-                        state = MANUAL;
-                        channel.println("ok");
-                        periodCounter = 0;
-                    }
+                if (mode == 1) {
+                  state = MANUAL;
+                  periodCounter = 0;
                 }
             }
             periodCounter++;
@@ -64,14 +50,9 @@ void ControllerTask::tick() {
 
         // MANUAL state: waiting for user input
         case MANUAL:
-            if (channel.available()) {
-                    char msg= (char) channel.read();
-                    if (msg == 'Led1_ON'){
-                        digitalWrite(led1, HIGH);
-                    } else if (msg == 'Led1_OFF'){
-                        digitalWrite(led1, LOW);
-                    }
-                }
+            if (periodCounter == 0) {
+              
+            }
             periodCounter++;
             break;
 

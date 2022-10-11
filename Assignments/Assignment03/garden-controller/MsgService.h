@@ -2,6 +2,7 @@
 #define __MSGSERVICE__
 
 #include "Arduino.h"
+#include "define.h"
 
 class Msg {
   String content;
@@ -16,7 +17,12 @@ public:
   }
 };
 
-class MsgServiceSerial {
+class Pattern {
+public:
+  virtual boolean match(const Msg& m) = 0;  
+};
+
+class MsgServiceClass {
     
 public: 
   
@@ -28,25 +34,12 @@ public:
   bool isMsgAvailable();
   Msg* receiveMsg();
 
+  bool isMsgAvailable(Pattern& pattern);
+  Msg* receiveMsg(Pattern& pattern);
+  
   void sendMsg(const String& msg);
 };
 
-class MsgServiceBluetooth {
-    
-public: 
-
-  Msg* currentMsg;
-  bool msgAvailable;
-
-  void init();  
-
-  bool isMsgAvailable();
-  Msg* receiveMsg();  
- 
-  void sendMsg(const String& msg);
-};
-
-extern MsgServiceSerial MsgService;
-extern MsgServiceBluetooth MsgServiceBT;
+extern MsgServiceClass MsgService;
 
 #endif
