@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_alarm) {
             if (mode != 0) {
-                System.out.println("Alarm btn clicked");
+                // System.out.println("Alarm btn clicked");
                 btChannel.sendMessage("AUTO");
                 mode = 0;
             }
@@ -209,20 +209,20 @@ public class MainActivity extends AppCompatActivity {
     private void toggleLed1() {
         if (led1Bool) {
             led1Bool = false;
-            btChannel.sendMessage("Led1_OFF");
+            btChannel.sendMessage("1");
         } else {
             led1Bool = true;
-            btChannel.sendMessage("Led1_ON");
+            btChannel.sendMessage("0");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            btChannel.sendMessage("Led2_OFF");
+            btChannel.sendMessage("1");
         } else {
             led2Bool = true;
-            btChannel.sendMessage("Led2_ON");
+            btChannel.sendMessage("0");
         }
     }
 
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requireManualControl() throws Exception {
-        System.out.println("Required MANUAL control");
+        // System.out.println("Required MANUAL control");
         connectToBTServer();
     }
 
@@ -252,19 +252,20 @@ public class MainActivity extends AppCompatActivity {
             public void onConnectionActive(final BluetoothChannel channel) {
                 System.out.println("Status : connected to server on device " + serverDevice.getName());
                 btChannel = channel;
-                btChannel.sendMessage("MANUAL");
                 btChannel.registerListener(new RealBluetoothChannel.Listener() {
                     @Override
                     public void onMessageReceived(String receivedMessage) {
-                        System.out.printf("> [RECEIVED from %s] %s",
-                                btChannel.getRemoteDeviceName(),
+                        System.out.println("> [RECEIVED from " +
+                                btChannel.getRemoteDeviceName() +
+                                "] " +
                                 receivedMessage);
                     }
 
                     @Override
                     public void onMessageSent(String sentMessage) {
-                        System.out.printf("> [SENT to %s] %s",
-                                btChannel.getRemoteDeviceName(),
+                        System.out.println("> [SENT to " +
+                                btChannel.getRemoteDeviceName() +
+                                "] " +
                                 sentMessage);
                     }
                 });
@@ -272,8 +273,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionCanceled() {
-                System.out.printf("Status : unable to connect, device %s not found!",
-                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
+                System.out.println("Status : unable to connect, device " +
+                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME +
+                        " not found!");
             }
         });
         execute.execute();
@@ -284,15 +286,19 @@ public class MainActivity extends AppCompatActivity {
         if (!btActive) {
             requireManualControl();
             btActive = true;
-            buttonRequireManualControl.setText("Close BT connection");
+            // buttonRequireManualControl.setText("Close BT connection");
             setEnabledAllBtns(true);
             mode = 1;
+            btChannel.sendMessage("M");
         } else {
+            /*
             btActive = false;
 
             buttonRequireManualControl.setText("Require manual control");
             setEnabledAllBtns(false);
             mode = 0;
+
+            */
         }
     }
 

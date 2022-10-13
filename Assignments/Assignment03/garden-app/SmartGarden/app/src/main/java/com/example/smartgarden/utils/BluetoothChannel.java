@@ -35,6 +35,7 @@ public abstract class BluetoothChannel implements CommChannel {
     @Override
     public void sendMessage(final String message){
         worker.write(message.getBytes());
+        // System.out.println("Message: " + message);
     }
 
     /**

@@ -43,6 +43,7 @@ void ControllerTask::tick() {
                 if (mode == 1) {
                   state = MANUAL;
                   periodCounter = 0;
+                  break;
                 }
             }
             periodCounter++;
@@ -50,8 +51,10 @@ void ControllerTask::tick() {
 
         // MANUAL state: waiting for user input
         case MANUAL:
-            if (periodCounter == 0) {
-              
+            if (led1 == 1) {
+              digitalWrite(LED1_PIN, HIGH);
+            } else if (led1 == 0) {
+              digitalWrite(LED1_PIN, LOW);
             }
             periodCounter++;
             break;

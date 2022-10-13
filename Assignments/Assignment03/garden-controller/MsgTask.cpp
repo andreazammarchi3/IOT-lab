@@ -34,18 +34,20 @@ void MsgTask::tick() {
   }
   if (bt->isMsgAvailable()) {
     Msg1* msg1 = bt->receiveMsg();
-    if (msg1->getContent() == "Led1_ON") {
+    if (msg1->getContent() == "1") {
       led1 = 1;
-      digitalWrite(LED1_PIN, HIGH);
-    } else if (msg1->getContent() == "Led1_OFF") {
+      led2 = 1;
+      led3 = 1;
+      led4 = 1;
+    } else if (msg1->getContent() == "0") {
       led1 = 0;
-      digitalWrite(LED1_PIN, LOW);
-    } else if (msg1->getContent() == "MANUAL") {
+      led2 = 0;
+      led3 = 0;
+      led4 = 0;
+    } else if (msg1->getContent() == "M") {
       mode = 1;
-    } else {
-      Serial.begin(19200);
-      Serial.print(msg1->getContent());
     }
+    delete msg1;
   }
         
 }

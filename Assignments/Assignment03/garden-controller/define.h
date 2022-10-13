@@ -6,6 +6,6 @@
 #define Rx 2
 #define Tx 3
 
-#define SCHED_PERIOD 100
-#define MSG_TASK_PERIOD 100
-#define CONTROLLER_TASK_PERIOD 100
+#define SCHED_PERIOD 500
+#define MSG_TASK_PERIOD 500
+#define CONTROLLER_TASK_PERIOD 500
