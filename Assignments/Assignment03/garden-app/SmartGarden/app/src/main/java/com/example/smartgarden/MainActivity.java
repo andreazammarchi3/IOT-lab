@@ -209,20 +209,20 @@ public class MainActivity extends AppCompatActivity {
     private void toggleLed1() {
         if (led1Bool) {
             led1Bool = false;
-            btChannel.sendMessage("1");
+            btChannel.sendMessage("0");
         } else {
             led1Bool = true;
-            btChannel.sendMessage("0");
+            btChannel.sendMessage("1");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            btChannel.sendMessage("1");
+            btChannel.sendMessage("0");
         } else {
             led2Bool = true;
-            btChannel.sendMessage("0");
+            btChannel.sendMessage("1");
         }
     }
 
@@ -285,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
     private void toggleBT() throws Exception {
         if (!btActive) {
             requireManualControl();
+            Thread.sleep(2000);
+
             btActive = true;
             // buttonRequireManualControl.setText("Close BT connection");
             setEnabledAllBtns(true);
