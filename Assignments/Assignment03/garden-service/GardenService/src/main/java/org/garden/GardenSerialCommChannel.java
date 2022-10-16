@@ -4,8 +4,8 @@ public class GardenSerialCommChannel {
     /**
      * Serial Communication Channel
      */
-    private SerialCommChannel channel;
-    private int[] lights = {0,0,0,0};
+    private final SerialCommChannel channel;
+    private int[] lights = new int[4];
     private int irrigation = 0;
     private int mode = 0;
 
@@ -35,13 +35,27 @@ public class GardenSerialCommChannel {
         mode = Integer.parseInt(getSerialData("mode"));
     }
 
+    public void setIrrigation(int value) {
+        sendSerialData("irri_" + value);
+    }
+
+    public void setLight(int led, int value) {
+        sendSerialData("led" + led + "_" + value);
+    }
+
+    public void setMode(int value) {
+        switch (value) {
+            case 0 -> sendSerialData("AUTO");
+            case 1 -> sendSerialData("MANUAL");
+            case 2 -> sendSerialData("ALARM");
+        }
+    }
+
     public int getIrrigation() {
         return irrigation;
     }
 
-    public int getLights(int i) {
-        return lights[i];
+    public int getLight(int led) {
+        return lights[led];
     }
-
-    public int getMode() { return mode; }
 }

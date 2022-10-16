@@ -108,14 +108,14 @@ void reconnect() {
 
 int getTemp() {
   tempVal = analogRead(tempPin);
-  tempVal = map(tempVal, 0, 4096, 1, 8);
+  tempVal = map(tempVal, 0, 4096, 1, 5);
   tempVal = int(tempVal);
   return tempVal;
 }
 
 int getLight() {
   lightVal = analogRead(photoPin);
-  lightVal = map(lightVal, 0, 4096, 1, 5);
+  lightVal = map(lightVal, 0, 4096, 1, 8);
   lightVal = int(lightVal);
   return lightVal;
 }
@@ -148,7 +148,7 @@ void loop()
     lastMsgTime = now;
     value++;
 
-    /* Publishing the temperature */
+    /* Publishing data */
     char tempString[2];
     dtostrf(getTemp(), 1, 0, tempString);
     char lightString[2];
@@ -160,5 +160,11 @@ void loop()
     Serial.print("Temperature, Luminosity: ");
     Serial.println(msg);
     client.publish("SmartGarden/data", msg);
+
+    if(getTemp() > 4) {
+      digitalWrite(ledPin, LOW);
+    } else {
+      digitalWrite(ledPin, HIGH);
+    }
   }
 }

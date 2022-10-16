@@ -3,26 +3,21 @@ package org.garden;
 import io.vertx.core.Vertx;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class MsgTask implements Runnable{
-    private final GardenSerialCommChannel gardenSerialCommChannel;
+public class MsgTask implements Runnable {
+    private Thread t;
     private final MQTTAgent agent;
     private final ServerSocket server;
     private int luminosity;
     private int temperature;
-    private int[] lights = new int[4];
-    private int irrigation;
-    private int mode;
-    private boolean running = true;
+    private ServiceTask serviceTask;
 
-    public MsgTask() throws Exception {
-        // Initialize the Serial Communication with Arduino
-        gardenSerialCommChannel = new GardenSerialCommChannel();
-
+    public MsgTask(ServiceTask serviceTask) throws Exception {
         // Initialize the Socket Server for Dashboard communication
         server = new ServerSocket(888);
         System.out.println("Listening for connection on port 888 ....");
@@ -31,11 +26,13 @@ public class MsgTask implements Runnable{
         Vertx vertx = Vertx.vertx();
         agent = new MQTTAgent();
         vertx.deployVerticle(agent);
+
+        this.serviceTask = serviceTask;
     }
 
     @Override
     public void run() {
-        while (isRunning()) {
+        while (!t.isInterrupted()) {
             try {
                 Socket clientSocket = server.accept();
                 InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
@@ -46,66 +43,39 @@ public class MsgTask implements Runnable{
                     // If dashboard is requesting data
                     if (line.equals("data")) {
                         // Get data from controller
-                        getDataFromController();
+                        // getDataFromController();
                         // Get data from sensor board
                         getDataFromSensorboard();
+                        serviceTask.setLuminosity(luminosity);
+                        serviceTask.setTemperature(temperature);
                         // Send data to dashboard
                         writer.println(
                                 luminosity + ", " +
                                         temperature + ", " +
-                                        lights[0] + ", " +
-                                        lights[1] + ", " +
-                                        lights[2] + ", " +
-                                        lights[3] + ", " +
-                                        irrigation + ", " +
-                                        mode);
+                                        serviceTask.getLight(0) + ", " +
+                                        serviceTask.getLight(0) + ", " +
+                                        serviceTask.getLight(0) + ", " +
+                                        serviceTask.getLight(0) + ", " +
+                                        serviceTask.getIrrigation() + ", " +
+                                        serviceTask.getMode());
                     }
                     line = reader.readLine();
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (IOException e) {
+                t.interrupt();
             }
         }
     }
 
-    private void getDataFromController() {
-        for (int i = 0; i < 4; i++) {
-            lights[i] = gardenSerialCommChannel.getLights(i);
+    public void start() {
+        if (t == null) {
+            t = new Thread(this, "MsgThread");
+            t.start();
         }
-        irrigation = gardenSerialCommChannel.getIrrigation();
-        mode = gardenSerialCommChannel.getMode();
     }
 
     private void getDataFromSensorboard() {
         luminosity = agent.getLuminosity();
         temperature = agent.getTemperature();
-    }
-
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setRunning(boolean state) {
-        running = state;
-    }
-
-    public void setLuminosity(int luminosity) {
-        this.luminosity = luminosity;
-    }
-
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    public void setLights(int position, int value) {
-        this.lights[position] = value;
-    }
-
-    public void setIrrigation(int irrigation) {
-        this.irrigation = irrigation;
-    }
-
-    public void setMode(int mode) {
-        this.mode = mode;
     }
 }

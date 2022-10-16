@@ -16,22 +16,34 @@ void MsgTask::init(int period) {
 
 void MsgTask::tick() {
   if (MsgService.isMsgAvailable()) {
-    Msg* msg = MsgService.receiveMsg();    
-    if (msg->getContent() == "led1"){
+    Msg* msg = MsgService.receiveMsg();  
+    String str = msg->getContent();  
+    if (str == "led1"){
         MsgService.sendMsg(String(led1));
-     } else if (msg->getContent() == "led2"){
+     } else if (str == "led2"){
         MsgService.sendMsg(String(led2)); 
-     } else if (msg->getContent() == "led3"){
+     } else if (str == "led3"){
         MsgService.sendMsg(String(led3));   
-     } else if (msg->getContent() == "led4"){
+     } else if (str == "led4"){
         MsgService.sendMsg(String(led4));
-     } else if (msg->getContent() == "irrigation"){
+     } else if (str == "lrrigation"){
         MsgService.sendMsg(String(irrigation));
-     } else if (msg->getContent() == "mode"){
+     } else if (str == "mode"){
         MsgService.sendMsg(String(mode));
+     } else if (str.indexOf("led1_") > 0) {
+        led1 = cutValueFromStr(str, "led1_");
+     } else if (str.indexOf("led2_") > 0) {
+        led2 = cutValueFromStr(str, "led2_");
+     } else if (str.indexOf("led3_") > 0) {
+        led3 = cutValueFromStr(str, "led3_");
+     } else if (str.indexOf("led4_") > 0) {
+        led4 = cutValueFromStr(str, "led4_");
+     } else if (str.indexOf("irr_") > 0) {
+        irrigation = cutValueFromStr(str, "irri_");
      }
     delete msg;
   }
+  /*
   if (bt->isMsgAvailable()) {
     Msg1* msg1 = bt->receiveMsg();
     if (msg1->getContent() == "1") {
@@ -49,5 +61,10 @@ void MsgTask::tick() {
     }
     delete msg1;
   }
-        
+  */   
+}
+
+int MsgTask::cutValueFromStr(String str, String sub) {
+  str.remove(4);
+  return str.toInt();
 }
