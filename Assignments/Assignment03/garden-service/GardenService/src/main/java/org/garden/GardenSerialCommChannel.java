@@ -33,11 +33,6 @@ public class GardenSerialCommChannel {
         irrigation = Integer.parseInt(getSerialData("irrigation"));
     }
 
-
-    public int getIrrigation() {
-        return irrigation;
-    }
-
     public void setIrrigation(int value) throws Exception {
         getSerialData("irri_" + value);
     }
@@ -68,13 +63,5 @@ public class GardenSerialCommChannel {
                 getSerialData("ALARM");
             }
         }
-    }
-
-    public boolean getOnOffLights() {
-        return onOffLights;
-    }
-
-    public int getFadeLights() {
-        return fadeLights;
     }
 }

@@ -9,17 +9,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class GardenService {
-    private static final int ACTIVITY_IRRIGATION_TIME = 8;
-    private static final int SLEEP_IRRIGATION_TIME = 60;
+    private static final int ACTIVITY_IRRIGATION_TIME = 4;
+    private static final int SLEEP_IRRIGATION_TIME = 10;
 
     private static GardenSerialCommChannel controller;
-    private static MQTTAgent agent;
 
     private static int luminosity = -1;
     private static int temperature = -1;
     private static boolean onOffLights = false;
     private static int fadeLights = -1;
-    private static int irrigation = -1;
+    private static int irrigation = 0;
     private static Mode mode = Mode.AUTO;
     private static int activitySecondsCounter = 0;
     private static int sleepSecondsCounter = 0;
@@ -50,7 +49,7 @@ public class GardenService {
 
         // Initialize the MQTT Agent
         Vertx vertx = Vertx.vertx();
-        agent = new MQTTAgent();
+        MQTTAgent agent = new MQTTAgent();
         vertx.deployVerticle(agent);
 
         while (true) {
@@ -85,8 +84,16 @@ public class GardenService {
                             controller.setFadeLights(luminosity);
                             if (luminosity < 2) {
                                 if (sleepSecondsCounter == 0) {
-                                    irrigation = temperature;
-                                    controller.setIrrigation(temperature);
+                                    keepIrrigating();
+                                } else {
+                                    keepSleeping();
+                                }
+                            } else {
+                                if (activitySecondsCounter != 0) {
+                                    keepIrrigating();
+                                }
+                                else if (sleepSecondsCounter != 0) {
+                                    keepSleeping();
                                 }
                             }
                         } else {
@@ -113,6 +120,26 @@ public class GardenService {
 
                 line = reader.readLine();
             }
+        }
+    }
+
+    private static void keepIrrigating() throws Exception {
+        irrigation = temperature;
+        controller.setIrrigation(temperature);
+        activitySecondsCounter++;
+        if (activitySecondsCounter == ACTIVITY_IRRIGATION_TIME) {
+            activitySecondsCounter = 0;
+            sleepSecondsCounter++;
+            irrigation = 0;
+            controller.setIrrigation(0);
+            keepSleeping();
+        }
+    }
+
+    private static void keepSleeping() {
+        sleepSecondsCounter++;
+        if (sleepSecondsCounter == SLEEP_IRRIGATION_TIME) {
+            sleepSecondsCounter = 0;
         }
     }
 }
