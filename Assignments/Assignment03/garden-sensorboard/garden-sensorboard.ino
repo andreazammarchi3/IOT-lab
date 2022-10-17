@@ -14,12 +14,8 @@ const int ledPin = 23;
 const int photoPin = 34;
 
 /* wifi network info */
-// Home Wi-Fi
-// const char* ssid = "AIR2";
-// const char* password = "giovanniboss";
-
-const char* ssid = "iPhone di Andrea";
-const char* password = "infondoalmar";
+const char* ssid = "AIR2";
+const char* password = "giovanniboss";
 
 /* MQTT server address */
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -146,7 +142,7 @@ void loop()
   client.loop();
 
   unsigned long now = millis();
-  if (now - lastMsgTime > 10000) {
+  if (now - lastMsgTime > 2000) {
     lastMsgTime = now;
     value++;
 

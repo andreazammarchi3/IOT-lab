@@ -12,11 +12,15 @@ class ControllerTask: public Task {
 
     enum {AUTO, MANUAL, ALARM} state;
     int periodCounter = 0;
-    
-    public:
-        ControllerTask();
-        void init(int period);
-        void tick();
+
+  public:
+    ControllerTask();
+    void init(int period);
+    void tick();
+
+  private:
+    void setOnOffLights(bool value);
+    void setFadeLights(int value);
 };
 
 #endif

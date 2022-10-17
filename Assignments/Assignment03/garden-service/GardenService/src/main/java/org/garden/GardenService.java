@@ -15,10 +15,11 @@ public class GardenService {
     private static GardenSerialCommChannel controller;
     private static MQTTAgent agent;
 
-    private static int luminosity = 0;
-    private static int temperature = 0;
-    private static int[] lights = new int[4];
-    private static int irrigation = 0;
+    private static int luminosity = -1;
+    private static int temperature = -1;
+    private static boolean onOffLights = false;
+    private static int fadeLights = -1;
+    private static int irrigation = -1;
     private static Mode mode = Mode.AUTO;
     private static int activitySecondsCounter = 0;
     private static int sleepSecondsCounter = 0;
@@ -64,52 +65,49 @@ public class GardenService {
                     // Get data from sensor board
                     getDataFromSensorboard();
 
-                    // Get data from controller
-                    //getDataFromController();
-
                     // Send data to dashboard
                     writer.println(
                             luminosity + ", " +
                             temperature + ", " +
-                            lights[0] + ", " +
-                            lights[1] + ", " +
-                            lights[2] + ", " +
-                            lights[3] + ", " +
+                            onOffLights + ", " +
+                            fadeLights + ", " +
                             irrigation + ", " +
-                            mode.getValue());
-
-                    switch (mode) {
-                        case AUTO -> {
-                            System.out.println("AUTO");
-                            if (luminosity < 5) {
-                                System.out.println("Lum < 5");
-                                // String response = controller.setLight(0,1);
-                                // System.out.println(response);
-                            }
+                            mode.getValue()
+                    );
+                }
+                switch (mode) {
+                    case AUTO -> {
+                        if (luminosity < 5) {
+                            onOffLights = true;
+                            controller.setOnOffLight(true);
+                            fadeLights = luminosity;
+                            controller.setFadeLights(luminosity);
+                        } else {
+                            onOffLights = false;
+                            controller.setOnOffLight(false);
+                            fadeLights = 0;
+                            controller.setFadeLights(0);
                         }
 
-                        case MANUAL -> {
-                            System.out.println("MANUAL");
-                        }
-
-                        case ALARM -> {
-                            System.out.println("ALARM");
+                        if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
+                            mode = Mode.ALARM;
+                            controller.setMode(mode.getValue());
                         }
                     }
+
+                    case MANUAL -> {
+                        System.out.println("MANUAL");
+                    }
+
+                    case ALARM -> {
+                        System.out.println("ALARM");
+                    }
                 }
+
                 line = reader.readLine();
             }
         }
     }
-
-    /*
-    private static void getDataFromController() {
-        for (int i = 0; i < 4; i++) {
-            lights[i] = controller.getLight(i);
-        }
-        irrigation = controller.getIrrigation();
-    }
-    */
 
     private static void getDataFromSensorboard() {
         luminosity = agent.getLuminosity();

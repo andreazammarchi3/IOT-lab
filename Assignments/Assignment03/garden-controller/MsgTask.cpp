@@ -1,51 +1,50 @@
 #include "MsgTask.h"
 
-extern int led1;
-extern int led2;
-extern int led3;
-extern int led4;
+extern bool onOffLights;
+extern int fadeLights;
 extern int irrigation;
-extern int mode;
 
 void MsgTask::init(int period) {
   Task::init(period);
   MsgService.init();
+  /*
   bt = new MsgServiceBT();
   bt->init();
+  */
 }
 
 void MsgTask::tick() {
   if (MsgService.isMsgAvailable()) {
     Msg* msg = MsgService.receiveMsg();  
     String str = msg->getContent();  
-    if (str == "led1"){
-        MsgService.sendMsg(String(led1));
-     } else if (str == "led2"){
-        MsgService.sendMsg(String(led2)); 
-     } else if (str == "led3"){
-        MsgService.sendMsg(String(led3));   
-     } else if (str == "led4"){
-        MsgService.sendMsg(String(led4));
-     } else if (str == "lrrigation"){
+    if (str == "onOffLights"){
+        if (onOffLights) {
+          MsgService.sendMsg(String(1));
+        } else {
+          MsgService.sendMsg(String(0));
+        }
+     } else if (str == "fadeLights"){
+        MsgService.sendMsg(String(fadeLights)); 
+     } else if (str == "irrigation"){
         MsgService.sendMsg(String(irrigation));
-     } else if (str == "mode"){
-        MsgService.sendMsg(String(mode));
-     } else if (str.indexOf("led1_") > 0) {
-        led1 = cutValueFromStr(str, "led1_");
-        MsgService.sendMsg("Ok");
-     } else if (str.indexOf("led2_") > 0) {
-        led2 = cutValueFromStr(str, "led2_");
-        MsgService.sendMsg("Ok");
-     } else if (str.indexOf("led3_") > 0) {
-        led3 = cutValueFromStr(str, "led3_");
-        MsgService.sendMsg("Ok");
-     } else if (str.indexOf("led4_") > 0) {
-        led4 = cutValueFromStr(str, "led4_");
-        MsgService.sendMsg("Ok");
-     } else if (str.indexOf("irr_") > 0) {
-        irrigation = cutValueFromStr(str, "irri_");
-        MsgService.sendMsg("Ok");
+     }  else if (str.indexOf("leds_") >= 0) {
+        String value = cutValueFromStr(str, "leds_");
+        if (value == "0") {
+          onOffLights = false;
+        } else {
+          onOffLights = true;
+        }
+        MsgService.sendMsg(value);
+     } else if (str.indexOf("fade_") >= 0) {
+        String value = cutValueFromStr(str, "fade_");
+        fadeLights = value.toInt();
+        MsgService.sendMsg(value);
+     } else if (str.indexOf("irri_") >= 0) {
+        String value = cutValueFromStr(str, "irri_");
+        irrigation = value.toInt();
+        MsgService.sendMsg(value);
      }
+     
     delete msg;
   }
   /*
@@ -69,7 +68,7 @@ void MsgTask::tick() {
   */   
 }
 
-int MsgTask::cutValueFromStr(String str, String sub) {
-  str.remove(4);
-  return str.toInt();
+String MsgTask::cutValueFromStr(String str, String sub) {
+  str.remove(0,5);
+  return str;
 }

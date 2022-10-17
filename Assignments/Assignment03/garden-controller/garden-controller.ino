@@ -7,16 +7,14 @@
 
 Scheduler sched;
 
-int led1 = 0;
-int led2 = 0;
-int led3 = 0;
-int led4 = 0;
+bool onOffLights = false;
+int fadeLights = 0;
 int irrigation = 0;
 
 int mode = 0;
- 
-void setup() 
-{ 
+
+void setup()
+{
   // Scheduler initialization, period = 100ms
   sched.init(SCHED_PERIOD);
 
@@ -29,10 +27,10 @@ void setup()
   Task* t1 = new ControllerTask();
   t1->init(CONTROLLER_TASK_PERIOD);
   sched.addTask(t1);
-  
-} 
- 
-void loop() 
-{ 
+
+}
+
+void loop()
+{
   sched.schedule();
 }

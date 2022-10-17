@@ -5,66 +5,76 @@ public class GardenSerialCommChannel {
      * Serial Communication Channel
      */
     private final SerialCommChannel channel;
-    private int[] lights = new int[4];
-    private int irrigation = 0;
-    private int mode = 0;
+    private boolean onOffLights = false;
+    private int fadeLights = -1;
+    private int irrigation = -1;
 
     public GardenSerialCommChannel() throws Exception {
         channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
-        //update();
+        update();
         System.out.println("Ready.");
     }
 
     public String getSerialData(String inputMsg) throws Exception {
         channel.sendMsg(inputMsg);
-        String response = channel.receiveMsg();
-        System.out.println(response);
-        return response;
+        return channel.receiveMsg();
     }
 
-    /*
+
     public void update() throws Exception {
-        lights[0] = Integer.parseInt(getSerialData("led1"));
-        lights[1] = Integer.parseInt(getSerialData("led2"));
-        lights[2] = Integer.parseInt(getSerialData("led3"));
-        lights[3] = Integer.parseInt(getSerialData("led4"));
+        if (Integer.parseInt(getSerialData("onOffLights")) == 0) {
+            onOffLights = false;
+        } else if(Integer.parseInt(getSerialData("onOffLights")) == 1) {
+            onOffLights = true;
+        }
+        fadeLights = Integer.parseInt(getSerialData("fadeLights"));
         irrigation = Integer.parseInt(getSerialData("irrigation"));
-        mode = Integer.parseInt(getSerialData("mode"));
     }
-    */
+
 
     public int getIrrigation() {
         return irrigation;
     }
 
-    public int getLight(int i) {
-        return lights[i];
+    public void setIrrigation(int value) throws Exception {
+        getSerialData("irri_" + value);
     }
 
-    public String setIrrigation(int value) throws Exception {
-        return getSerialData("irri_" + value);
+    public void setOnOffLight(boolean value) throws Exception {
+        String msg;
+        if (value) {
+            msg = "leds_" + 1;
+        } else {
+            msg = "leds_" + 0;
+        }
+        getSerialData(msg);
     }
 
-    public String setLight(int led, int value) throws Exception {
-        return getSerialData("led" + led + "_" + value);
+    public void setFadeLights(int value) throws Exception {
+        getSerialData("fade_" + value);
     }
 
-    public String setMode(int value) throws Exception {
+    public void setMode(int value) throws Exception {
         switch (value) {
             case 0 -> {
-                return getSerialData("AUTO");
+                getSerialData("AUTO");
             }
             case 1 -> {
-                return getSerialData("MANUAL");
+                getSerialData("MANUAL");
             }
             case 2 -> {
-                return getSerialData("ALARM");
-            }
-            default -> {
-                return "Error";
+                getSerialData("ALARM");
             }
         }
+    }
+
+    public boolean getOnOffLights() {
+        return onOffLights;
+    }
+
+    public int getFadeLights() {
+        return fadeLights;
     }
 }

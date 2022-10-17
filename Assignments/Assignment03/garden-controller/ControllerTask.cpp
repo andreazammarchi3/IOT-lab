@@ -1,10 +1,8 @@
 #include "ControllerTask.h"
 #include <SoftwareSerial.h>
 
-extern int led1;
-extern int led2;
-extern int led3;
-extern int led4;
+extern bool onOffLights;
+extern int fadeLights;
 extern int irrigation;
 extern int mode;
 
@@ -46,10 +44,8 @@ void ControllerTask::tick() {
           break;
         }
         // Update leds
-        digitalWrite(LED1_PIN, led1);
-        digitalWrite(LED2_PIN, led2);
-        digitalWrite(LED3_PIN, 64 * led3);
-        digitalWrite(LED4_PIN, 64 * led4);
+        setOnOffLights(onOffLights);
+        setFadeLights(fadeLights);
       }
       periodCounter++;
       break;
@@ -57,10 +53,8 @@ void ControllerTask::tick() {
     // MANUAL state: waiting for user input
     case MANUAL:
       // Update leds
-      digitalWrite(LED1_PIN, led1);
-      digitalWrite(LED2_PIN, led2);
-      digitalWrite(LED3_PIN, 64 * led3);
-      digitalWrite(LED4_PIN, 64 * led4);
+      setOnOffLights(onOffLights);
+      setFadeLights(fadeLights);
 
       periodCounter++;
       break;
@@ -71,4 +65,19 @@ void ControllerTask::tick() {
       periodCounter++;
       break;
   }
+}
+
+void ControllerTask::setOnOffLights(bool value) {
+  if (value) {
+    digitalWrite(LED1_PIN, HIGH);
+    digitalWrite(LED2_PIN, HIGH);
+  } else {
+    digitalWrite(LED1_PIN, LOW);
+    digitalWrite(LED2_PIN, LOW);
+  }
+}
+
+void ControllerTask::setFadeLights(int value) {
+  analogWrite(LED3_PIN, 51 * value);
+  analogWrite(LED3_PIN, 51 * value);
 }

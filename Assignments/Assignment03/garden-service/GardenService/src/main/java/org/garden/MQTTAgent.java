@@ -35,15 +35,14 @@ public class MQTTAgent extends AbstractVerticle {
                     .subscribe("SmartGarden/data", 2);
 
 
+            /*
             log("publishing a msg");
             client.publish("SmartGarden/data",
                     Buffer.buffer("hello"),
                     MqttQoS.AT_LEAST_ONCE,
                     false,
                     false);
-
-
-
+             */
         });
     }
 

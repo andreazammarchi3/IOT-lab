@@ -8,12 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GardenDashboard {
-    static GardenDashboardGUI gui;
-    static int luminosity;
-    static int temperature;
-    static int[] lights = new int[4];
-    static int irrigation;
-    static int mode;
+    private static GardenDashboardGUI gui;
+    private static int luminosity;
+    private static int temperature;
+    private static boolean onOffLights;
+    private static int fadeLights;
+    private static int irrigation;
+    private static int mode;
     public static void main(String[] args) throws Exception {
         Socket clientSocket = new Socket("localhost", 888);
         BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -27,7 +28,7 @@ public class GardenDashboard {
             writer.println("data");
             String line = reader.readLine();
             while (!line.isEmpty()) {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
 
                 readData(line);
                 updateGUI();
@@ -42,21 +43,17 @@ public class GardenDashboard {
         List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
         luminosity = Integer.parseInt(items.get(0));
         temperature = Integer.parseInt(items.get(1));
-        lights[0] = Integer.parseInt(items.get(2));
-        lights[1] = Integer.parseInt(items.get(3));
-        lights[2] = Integer.parseInt(items.get(4));
-        lights[3] = Integer.parseInt(items.get(5));
-        irrigation = Integer.parseInt(items.get(6));
-        mode = Integer.parseInt(items.get(7));
+        onOffLights = Boolean.parseBoolean(items.get(2));
+        fadeLights = Integer.parseInt(items.get(3));
+        irrigation = Integer.parseInt(items.get(4));
+        mode = Integer.parseInt(items.get(5));
     }
 
     private static void updateGUI() {
         gui.updateLuminosity(luminosity);
         gui.updateTemperature(temperature);
-        gui.updateLed1(lights[0]);
-        gui.updateLed2(lights[1]);
-        gui.updateLed3(lights[2]);
-        gui.updateLed4(lights[3]);
+        gui.updateOnOffLights(onOffLights);
+        gui.updateFadeLights(fadeLights);
         gui.updateIrrigation(irrigation);
         gui.updateMode(mode);
     }

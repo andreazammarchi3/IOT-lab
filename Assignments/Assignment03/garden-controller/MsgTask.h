@@ -8,14 +8,14 @@
 #include "define.h"
 
 class MsgTask: public Task {
-  MsgServiceBT* bt;
-  
+    MsgServiceBT* bt;
+
   public:
     void init(int period);
     void tick();
 
   private:
-    int cutValueFromStr(String str, String sub);
+    String cutValueFromStr(String str, String sub);
 };
 
 #endif
