@@ -9,8 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class GardenService {
-    private static final int ACTIVITY_IRRIGATION_SECONDS = 8;
-    private static final int SLEEP_IRRIGATION_SECONDS = 60;
+    private static final int ACTIVITY_IRRIGATION_TIME = 8;
+    private static final int SLEEP_IRRIGATION_TIME = 60;
 
     private static GardenSerialCommChannel controller;
     private static MQTTAgent agent;
@@ -63,7 +63,8 @@ public class GardenService {
                 // If dashboard is requesting data
                 if (line.equals("data")) {
                     // Get data from sensor board
-                    getDataFromSensorboard();
+                    luminosity = agent.getLuminosity();
+                    temperature = agent.getTemperature();
 
                     // Send data to dashboard
                     writer.println(
@@ -82,6 +83,12 @@ public class GardenService {
                             controller.setOnOffLight(true);
                             fadeLights = luminosity;
                             controller.setFadeLights(luminosity);
+                            if (luminosity < 2) {
+                                if (sleepSecondsCounter == 0) {
+                                    irrigation = temperature;
+                                    controller.setIrrigation(temperature);
+                                }
+                            }
                         } else {
                             onOffLights = false;
                             controller.setOnOffLight(false);
@@ -107,10 +114,5 @@ public class GardenService {
                 line = reader.readLine();
             }
         }
-    }
-
-    private static void getDataFromSensorboard() {
-        luminosity = agent.getLuminosity();
-        temperature = agent.getTemperature();
     }
 }

@@ -28,7 +28,7 @@ public class GardenDashboard {
             writer.println("data");
             String line = reader.readLine();
             while (!line.isEmpty()) {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
 
                 readData(line);
                 updateGUI();
