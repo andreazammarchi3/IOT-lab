@@ -26,6 +26,7 @@ public class GardenSerialCommChannel {
         channel.sendMsg(inputMsg);
     }
 
+    /*
     public void update() throws Exception {
         lights[0] = Integer.parseInt(getSerialData("led1"));
         lights[1] = Integer.parseInt(getSerialData("led2"));
@@ -34,6 +35,7 @@ public class GardenSerialCommChannel {
         irrigation = Integer.parseInt(getSerialData("irrigation"));
         mode = Integer.parseInt(getSerialData("mode"));
     }
+    */
 
     public void setIrrigation(int value) {
         sendSerialData("irri_" + value);
@@ -57,5 +59,9 @@ public class GardenSerialCommChannel {
 
     public int getLight(int led) {
         return lights[led];
+    }
+
+    public int getMode() {
+        return mode;
     }
 }
