@@ -63,8 +63,10 @@ public class GardenService {
                 if (line.equals("data")) {
                     // Get data from sensor board
                     getDataFromSensorboard();
+
                     // Get data from controller
                     //getDataFromController();
+
                     // Send data to dashboard
                     writer.println(
                             luminosity + ", " +
@@ -75,59 +77,27 @@ public class GardenService {
                             lights[3] + ", " +
                             irrigation + ", " +
                             mode.getValue());
-                }
 
-                switch (mode) {
-                    case AUTO -> {
-                        System.out.println("AUTO");
-                        if (luminosity < 5) {
-                            controller.setLight(0, 1);
-                            controller.setLight(1, 1);
-                            controller.setLight(2, luminosity);
-                            controller.setLight(3, luminosity);
-                            if (sleepSecondsCounter == 0) {
-                                if (activitySecondsCounter < ACTIVITY_IRRIGATION_SECONDS) {
-                                    if (luminosity < 2) {
-                                        irrigation = temperature;
-                                        controller.setIrrigation(temperature);
-                                    } else {
-                                        irrigation = 0;
-                                        controller.setIrrigation(0);
-                                    }
-                                } else {
-                                    activitySecondsCounter = 0;
-                                    sleepSecondsCounter++;
-                                }
-                            } else {
-                                if (sleepSecondsCounter == SLEEP_IRRIGATION_SECONDS) {
-                                    sleepSecondsCounter = 0;
-                                } else {
-                                    sleepSecondsCounter++;
-                                }
-                            }
-                        } else {
-                            for (int i = 0; i < 4; i++) {
-                                controller.setLight(i, 0);
+                    switch (mode) {
+                        case AUTO -> {
+                            System.out.println("AUTO");
+                            if (luminosity < 5) {
+                                System.out.println("Lum < 5");
+                                // String response = controller.setLight(0,1);
+                                // System.out.println(response);
                             }
                         }
 
-                        if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
-                            mode = Mode.ALARM;
-                            controller.setMode(mode.getValue());
-                            agent.setMode(mode.getValue());
+                        case MANUAL -> {
+                            System.out.println("MANUAL");
                         }
-                        Thread.sleep(2000);
-                    }
 
-                    case MANUAL -> {
-                    }
-
-                    case ALARM -> {
-                        System.out.println("ALARM");
+                        case ALARM -> {
+                            System.out.println("ALARM");
+                        }
                     }
                 }
                 line = reader.readLine();
-                Thread.sleep(1000);
             }
         }
     }
