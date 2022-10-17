@@ -15,8 +15,8 @@ const int photoPin = 34;
 
 /* wifi network info */
 
-const char* ssid = "AIR2";
-const char* password = "giovanniboss";
+const char* ssid = "iPhone di Andrea";
+const char* password = "infondoalmar";
 
 /* MQTT server address */
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -108,14 +108,14 @@ void reconnect() {
 
 int getTemp() {
   tempVal = analogRead(tempPin);
-  tempVal = map(tempVal, 0, 4096, 1, 8);
+  tempVal = map(tempVal, 0, 4096, 1, 5);
   tempVal = int(tempVal);
   return tempVal;
 }
 
 int getLight() {
   lightVal = analogRead(photoPin);
-  lightVal = map(lightVal, 0, 4096, 1, 5);
+  lightVal = map(lightVal, 0, 4096, 1, 8);
   lightVal = int(lightVal);
   return lightVal;
 }
