@@ -62,6 +62,6 @@ public class GardenDashboardGUI {
         if (value == 0) {
             value = 5;
         }
-        textAreaFadeLights.setText("Fading Lights: " + (6 - value) + "/5");
+        textAreaFadeLights.setText("Fading Lights: " + (5 - value) + "/4");
     }
 }
