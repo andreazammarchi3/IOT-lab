@@ -15,8 +15,8 @@ const int photoPin = 34;
 
 /* wifi network info */
 
-const char* ssid = "iPhone di Andrea";
-const char* password = "infondoalmar";
+const char* ssid = "AIR2";
+const char* password = "giovanniboss";
 
 /* MQTT server address */
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -153,12 +153,12 @@ void loop()
     dtostrf(getTemp(), 1, 0, tempString);
     char lightString[2];
     dtostrf(getLight(), 1, 0, lightString);
-    char msg[10];
     strcpy(msg, tempString);
     strcat(msg, ", ");
     strcat(msg, lightString);
     Serial.print("Temperature, Luminosity: ");
     Serial.println(msg);
+
     client.publish("SmartGarden/data", msg);
   }
 }
