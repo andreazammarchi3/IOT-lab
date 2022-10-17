@@ -5,6 +5,7 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 //#include <SoftPWM.h>
+#include <math.h>
 #include "ServoTimer2.h"
 #include "Task.h"
 #include "define.h"
@@ -21,7 +22,7 @@ class ControllerTask: public Task {
 
   private:
     void setOnOffLights(bool value);
-    void setFadeLights(int value);
+    void setFadeLights(int value, int periodCounter);
     void updateServoPosition();
 };
 

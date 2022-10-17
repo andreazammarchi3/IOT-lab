@@ -38,7 +38,9 @@ void ControllerTask::tick() {
     case AUTO:
       if (periodCounter == 0) {
         servo.write(servoPosition);
-      } else if (periodCounter % 10 == 0) { // Ogni mezzo secondo
+      } else if (periodCounter % 100 == 0) {  // Ogni mezzo secondo
+        //digitalWrite(LED3_PIN, HIGH);
+        //digitalWrite(LED4_PIN, HIGH);
         if (mode == 1) {
           state = MANUAL;
           periodCounter = 0;
@@ -46,23 +48,24 @@ void ControllerTask::tick() {
         }
         // Update leds
         setOnOffLights(onOffLights);
-        setFadeLights(fadeLights);
+      } else {
+        //digitalWrite(LED3_PIN, LOW);
+        //digitalWrite(LED4_PIN, LOW);
       }
-      if (periodCounter % (irrigation / 2) == 0) {
-        // Update servo
-        updateServoPosition();
+      if (periodCounter % ((5 - irrigation) * 200) == 0) {
+        if(irrigation != 0) {
+          // Update servo
+          updateServoPosition();
+        }
+        periodCounter = 0;
       }
+      setFadeLights(fadeLights, periodCounter);
+
       periodCounter++;
       break;
 
     // MANUAL state: waiting for user input
     case MANUAL:
-      // Update leds
-      setOnOffLights(onOffLights);
-      setFadeLights(fadeLights);
-
-      // Update servo
-      updateServoPosition();
 
       periodCounter++;
       break;
@@ -85,9 +88,17 @@ void ControllerTask::setOnOffLights(bool value) {
   }
 }
 
-void ControllerTask::setFadeLights(int value) {
+void ControllerTask::setFadeLights(int value, int periodCounter) {
   //SoftPWMSet(LED3_PIN, value);
   //SoftPWMSet(LED4_PIN, value);
+  int dc = periodCounter % (value/2);
+  if (dc == 0) {
+    digitalWrite(LED3_PIN, HIGH);
+    digitalWrite(LED4_PIN, HIGH);
+  } else {
+    digitalWrite(LED3_PIN, LOW);
+    digitalWrite(LED4_PIN, LOW);
+  }
 }
 
 void ControllerTask::updateServoPosition() {
