@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#include <SoftPWM.h>
 #include "ServoTimer2.h"
 #include "Task.h"
 #include "define.h"

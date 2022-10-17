@@ -17,6 +17,7 @@ ControllerTask::ControllerTask() {
   pinMode(Rx, INPUT);
   pinMode(Tx, OUTPUT);
   servo.attach(SERVO_PIN);
+  SoftPWMBegin(SOFTPWM_NORMAL);
 }
 
 // Initializer
@@ -33,7 +34,7 @@ void ControllerTask::tick() {
     case AUTO:
       if (periodCounter == 0) {
         servo.write(750);
-      } else {
+      } else if (periodCounter % 10 == 0) {
         if (mode == 1) {
           state = MANUAL;
           periodCounter = 0;
@@ -74,6 +75,6 @@ void ControllerTask::setOnOffLights(bool value) {
 }
 
 void ControllerTask::setFadeLights(int value) {
-  analogWrite(LED3_PIN, value);
-  analogWrite(LED4_PIN, value);
+  SoftPWMSet(LED3_PIN, value);
+  SoftPWMSet(LED4_PIN, value);
 }

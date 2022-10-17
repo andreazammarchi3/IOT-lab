@@ -39,7 +39,7 @@ void MsgTask::tick() {
         String value = cutValueFromStr(str, "fade_");
         fadeLights = value.toInt();
         if (fadeLights != 0) {
-          fadeLights = (5 - fadeLights)*51;
+          fadeLights = (6 - fadeLights)*15;
         } else {
           fadeLights = 0;
         }

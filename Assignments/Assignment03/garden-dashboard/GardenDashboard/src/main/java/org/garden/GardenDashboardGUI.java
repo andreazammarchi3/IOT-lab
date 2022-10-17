@@ -59,6 +59,9 @@ public class GardenDashboardGUI {
     }
 
     public void updateFadeLights(int value) {
+        if (value == 0) {
+            value = 5;
+        }
         textAreaFadeLights.setText("Fading Lights: " + (5 - value) + "/5");
     }
 }
