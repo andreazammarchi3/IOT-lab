@@ -38,7 +38,12 @@ void MsgTask::tick() {
      } else if (str.indexOf("fade_") >= 0) {
         String value = cutValueFromStr(str, "fade_");
         fadeLights = value.toInt();
-        MsgService.sendMsg(value);
+        if (fadeLights != 0) {
+          fadeLights = (5 - fadeLights)*51;
+        } else {
+          fadeLights = 0;
+        }
+        MsgService.sendMsg(String(fadeLights));
      } else if (str.indexOf("irri_") >= 0) {
         String value = cutValueFromStr(str, "irri_");
         irrigation = value.toInt();

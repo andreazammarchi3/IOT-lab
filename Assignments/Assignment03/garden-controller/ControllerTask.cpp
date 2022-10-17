@@ -32,10 +32,6 @@ void ControllerTask::tick() {
     // AUTO state
     case AUTO:
       if (periodCounter == 0) {
-        digitalWrite(LED1_PIN, 0);
-        digitalWrite(LED2_PIN, 0);
-        digitalWrite(LED3_PIN, 0);
-        digitalWrite(LED4_PIN, 0);
         servo.write(750);
       } else {
         if (mode == 1) {
@@ -78,6 +74,6 @@ void ControllerTask::setOnOffLights(bool value) {
 }
 
 void ControllerTask::setFadeLights(int value) {
-  analogWrite(LED3_PIN, 51 * value);
-  analogWrite(LED3_PIN, 51 * value);
+  analogWrite(LED3_PIN, value);
+  analogWrite(LED4_PIN, value);
 }

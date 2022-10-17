@@ -53,7 +53,8 @@ public class GardenSerialCommChannel {
     }
 
     public void setFadeLights(int value) throws Exception {
-        getSerialData("fade_" + value);
+        String msg = getSerialData("fade_" + value);
+        System.out.println(msg);
     }
 
     public void setMode(int value) throws Exception {
