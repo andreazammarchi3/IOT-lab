@@ -57,11 +57,23 @@ public class GardenSerialCommChannel {
         return irrigation;
     }
 
-    public int getLight(int led) {
-        return lights[led];
+    public int getLight(int i) {
+        return lights[i];
     }
 
-    public int getMode() {
-        return mode;
+    public void setIrrigation(int value) {
+        sendSerialData("irri_" + value);
+    }
+
+    public void setLight(int led, int value) {
+        sendSerialData("led" + led + "_" + value);
+    }
+
+    public void setMode(int value) {
+        switch (value) {
+            case 0 -> sendSerialData("AUTO");
+            case 1 -> sendSerialData("MANUAL");
+            case 2 -> sendSerialData("ALARM");
+        }
     }
 }
