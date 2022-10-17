@@ -14,9 +14,12 @@ const int ledPin = 23;
 const int photoPin = 34;
 
 /* wifi network info */
+// Home Wi-Fi
+// const char* ssid = "AIR2";
+// const char* password = "giovanniboss";
 
-const char* ssid = "AIR2";
-const char* password = "giovanniboss";
+const char* ssid = "iPhone di Andrea";
+const char* password = "infondoalmar";
 
 /* MQTT server address */
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -147,7 +150,7 @@ void loop()
     lastMsgTime = now;
     value++;
 
-    /* Publishing the temperature */
+    /* Publishing data */
     char tempString[2];
     dtostrf(getTemp(), 1, 0, tempString);
     char lightString[2];
@@ -157,5 +160,13 @@ void loop()
     strcat(msg, lightString);
 
     client.publish("SmartGarden/data", msg);
+
+    /*
+    if(getTemp() > 4) {
+      digitalWrite(ledPin, LOW);
+    } else {
+      digitalWrite(ledPin, HIGH);
+    }
+    */
   }
 }

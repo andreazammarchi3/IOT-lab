@@ -61,10 +61,10 @@ public class GardenService {
             while (!line.isEmpty()) {
                 // If dashboard is requesting data
                 if (line.equals("data")) {
-                    // Get data from controller
-                    getDataFromController();
                     // Get data from sensor board
                     getDataFromSensorboard();
+                    // Get data from controller
+                    //getDataFromController();
                     // Send data to dashboard
                     writer.println(
                             luminosity + ", " +
@@ -131,12 +131,14 @@ public class GardenService {
         }
     }
 
+    /*
     private static void getDataFromController() {
         for (int i = 0; i < 4; i++) {
             lights[i] = controller.getLight(i);
         }
         irrigation = controller.getIrrigation();
     }
+    */
 
     private static void getDataFromSensorboard() {
         luminosity = agent.getLuminosity();
