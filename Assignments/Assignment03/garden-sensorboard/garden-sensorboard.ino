@@ -63,20 +63,18 @@ void callback(char* topic, byte* message, unsigned int length) {
     messageTemp += (char)message[i];
   }
   Serial.println();
-  /*
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+  // If a message is received on the topic, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if(messageTemp == "on"){
-      Serial.println("on");
+  if (String(topic) == "SmartGarden/data") {
+    if(messageTemp == "led_ON"){
+      Serial.println("led_ON");
       digitalWrite(ledPin, HIGH);
     }
-    else if(messageTemp == "off"){
-      Serial.println("off");
+    else if(messageTemp == "led_OFF"){
+      Serial.println("led_OFF");
       digitalWrite(ledPin, LOW);
     }
-    */
+  }
 }
 
 void reconnect() {
@@ -95,7 +93,7 @@ void reconnect() {
       // Once connected, publish an announcement...
       // client.publish("outTopic", "hello world");
       // ... and resubscribe
-      client.subscribe("SmartGarden/output");
+      client.subscribe("SmartGarden/data");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -108,6 +106,7 @@ void reconnect() {
 
 int getTemp() {
   tempVal = analogRead(tempPin);
+  Serial.println(tempVal);
   tempVal = map(tempVal, 0, 4096, 1, 5);
   tempVal = int(tempVal);
   return tempVal;
@@ -156,8 +155,6 @@ void loop()
     strcpy(msg, tempString);
     strcat(msg, ", ");
     strcat(msg, lightString);
-    Serial.print("Temperature, Luminosity: ");
-    Serial.println(msg);
 
     client.publish("SmartGarden/data", msg);
   }

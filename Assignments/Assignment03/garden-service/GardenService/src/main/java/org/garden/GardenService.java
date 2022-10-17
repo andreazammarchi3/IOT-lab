@@ -9,8 +9,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class GardenService {
+    private static final int ACTIVITY_IRRIGATION_SECONDS = 8;
+    private static final int SLEEP_IRRIGATION_SECONDS = 60;
+
     private static GardenSerialCommChannel controller;
     private static MQTTAgent agent;
+
     private static int luminosity = 0;
     private static int temperature = 0;
     private static int[] lights = new int[4];
@@ -109,6 +113,7 @@ public class GardenService {
                         if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
                             mode = Mode.ALARM;
                             controller.setMode(mode.getValue());
+                            agent.setMode(mode.getValue());
                         }
                         // wait(1000);
                         break;
@@ -128,7 +133,7 @@ public class GardenService {
 
     private static void getDataFromController() {
         for (int i = 0; i < 4; i++) {
-            lights[i] = controller.getLights(i);
+            lights[i] = controller.getLight(i);
         }
         irrigation = controller.getIrrigation();
     }

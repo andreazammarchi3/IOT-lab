@@ -6,6 +6,7 @@
 #include <avr/wdt.h>
 #include "ServoTimer2.h"
 #include "Task.h"
+#include "define.h"
 
 class ControllerTask: public Task {
 
