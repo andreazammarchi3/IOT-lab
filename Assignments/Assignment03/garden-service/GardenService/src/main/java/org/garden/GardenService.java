@@ -78,7 +78,8 @@ public class GardenService {
                 }
 
                 switch (mode) {
-                    case AUTO:
+                    case AUTO -> {
+                        System.out.println("AUTO");
                         if (luminosity < 5) {
                             controller.setLight(0, 1);
                             controller.setLight(1, 1);
@@ -115,15 +116,15 @@ public class GardenService {
                             controller.setMode(mode.getValue());
                             agent.setMode(mode.getValue());
                         }
-                        // wait(1000);
-                        break;
+                        Thread.sleep(2000);
+                    }
 
-                    case MANUAL:
-                        break;
+                    case MANUAL -> {
+                    }
 
-                    case ALARM:
+                    case ALARM -> {
                         System.out.println("ALARM");
-                        break;
+                    }
                 }
                 line = reader.readLine();
                 Thread.sleep(1000);

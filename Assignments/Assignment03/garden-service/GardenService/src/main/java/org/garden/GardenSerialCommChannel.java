@@ -19,11 +19,9 @@ public class GardenSerialCommChannel {
 
     public String getSerialData(String inputMsg) throws Exception {
         channel.sendMsg(inputMsg);
-        return channel.receiveMsg();
-    }
-
-    public void sendSerialData(String inputMsg) {
-        channel.sendMsg(inputMsg);
+        String response = channel.receiveMsg();
+        System.out.println(response);
+        return response;
     }
 
     /*
@@ -37,22 +35,6 @@ public class GardenSerialCommChannel {
     }
     */
 
-    public void setIrrigation(int value) {
-        sendSerialData("irri_" + value);
-    }
-
-    public void setLight(int led, int value) {
-        sendSerialData("led" + led + "_" + value);
-    }
-
-    public void setMode(int value) {
-        switch (value) {
-            case 0 -> sendSerialData("AUTO");
-            case 1 -> sendSerialData("MANUAL");
-            case 2 -> sendSerialData("ALARM");
-        }
-    }
-
     public int getIrrigation() {
         return irrigation;
     }
@@ -61,19 +43,28 @@ public class GardenSerialCommChannel {
         return lights[i];
     }
 
-    public void setIrrigation(int value) {
-        sendSerialData("irri_" + value);
+    public String setIrrigation(int value) throws Exception {
+        return getSerialData("irri_" + value);
     }
 
-    public void setLight(int led, int value) {
-        sendSerialData("led" + led + "_" + value);
+    public String setLight(int led, int value) throws Exception {
+        return getSerialData("led" + led + "_" + value);
     }
 
-    public void setMode(int value) {
+    public String setMode(int value) throws Exception {
         switch (value) {
-            case 0 -> sendSerialData("AUTO");
-            case 1 -> sendSerialData("MANUAL");
-            case 2 -> sendSerialData("ALARM");
+            case 0 -> {
+                return getSerialData("AUTO");
+            }
+            case 1 -> {
+                return getSerialData("MANUAL");
+            }
+            case 2 -> {
+                return getSerialData("ALARM");
+            }
+            default -> {
+                return "Error";
+            }
         }
     }
 }

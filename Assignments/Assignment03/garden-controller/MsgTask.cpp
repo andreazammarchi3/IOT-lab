@@ -32,14 +32,19 @@ void MsgTask::tick() {
         MsgService.sendMsg(String(mode));
      } else if (str.indexOf("led1_") > 0) {
         led1 = cutValueFromStr(str, "led1_");
+        MsgService.sendMsg("Ok");
      } else if (str.indexOf("led2_") > 0) {
         led2 = cutValueFromStr(str, "led2_");
+        MsgService.sendMsg("Ok");
      } else if (str.indexOf("led3_") > 0) {
         led3 = cutValueFromStr(str, "led3_");
+        MsgService.sendMsg("Ok");
      } else if (str.indexOf("led4_") > 0) {
         led4 = cutValueFromStr(str, "led4_");
+        MsgService.sendMsg("Ok");
      } else if (str.indexOf("irr_") > 0) {
         irrigation = cutValueFromStr(str, "irri_");
+        MsgService.sendMsg("Ok");
      }
     delete msg;
   }
