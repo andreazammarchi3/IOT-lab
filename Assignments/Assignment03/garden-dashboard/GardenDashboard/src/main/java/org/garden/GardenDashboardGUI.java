@@ -31,11 +31,11 @@ public class GardenDashboardGUI {
     }
 
     public void updateLuminosity(int value) {
-        textAreaL.setText("Luminosity: " + value + "/8");
+        textAreaL.setText("Luminosity: " + value + "/7");
     }
 
     public void updateTemperature(int value) {
-        textAreaT.setText("Temperature: " + value + "/5");
+        textAreaT.setText("Temperature: " + value + "/4");
     }
 
     public void updateIrrigation(int value) {

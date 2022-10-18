@@ -13,6 +13,12 @@ int irrigation = 0;
 
 int mode = 0;
 
+int led1BT = 0;
+int led2BT = 0;
+int led3BT = 0;
+int led4BT = 0;
+int irrigationBT = 0;
+
 void setup()
 {
   // Scheduler initialization, period = 100ms

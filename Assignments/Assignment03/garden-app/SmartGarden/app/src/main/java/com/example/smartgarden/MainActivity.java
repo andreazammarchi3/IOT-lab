@@ -136,10 +136,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_alarm) {
-            if (mode != 0) {
+            if (mode != 1) {
                 // System.out.println("Alarm btn clicked");
-                btChannel.sendMessage("AUTO");
-                mode = 0;
+                btChannel.sendMessage("MANUAL");
+                mode = 1;
             }
         }
         return true;
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
-            btChannel.sendMessage("Led3_" + led3Counter);
+            btChannel.sendMessage("led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
-            btChannel.sendMessage("Led4_" + led4Counter);
+            btChannel.sendMessage("led4_" + led4Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
@@ -177,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
-            btChannel.sendMessage("irr_" + irrCounter);
+            btChannel.sendMessage("irri_" + irrCounter);
+            irrMode = true;
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
@@ -185,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
-            btChannel.sendMessage("Led3_" + led3Counter);
+            btChannel.sendMessage("led3_" + led3Counter);
         }
         led3CounterText.setText(String.valueOf(led3Counter));
     }
@@ -193,52 +194,56 @@ public class MainActivity extends AppCompatActivity {
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
-            btChannel.sendMessage("Led4_" + led3Counter);
+            btChannel.sendMessage("led4_" + led4Counter);
         }
         led4CounterText.setText(String.valueOf(led4Counter));
     }
 
     private void decIrr() {
-        if (irrCounter > 0) {
+        if (irrCounter > 1) {
             irrCounter--;
-            btChannel.sendMessage("irr_" + irrCounter);
+            btChannel.sendMessage("irri_" + irrCounter);
+            irrMode = true;
         }
         irrCounterText.setText(String.valueOf(irrCounter));
     }
 
     private void toggleLed1() {
+        if (mode == 0) {
+            mode = 1;
+            btChannel.sendMessage("MANUAL");
+        }
         if (led1Bool) {
             led1Bool = false;
-            btChannel.sendMessage("0");
+            btChannel.sendMessage("led1_0");
         } else {
             led1Bool = true;
-            btChannel.sendMessage("1");
+            btChannel.sendMessage("led1_1");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            btChannel.sendMessage("0");
+            btChannel.sendMessage("led2_0");
         } else {
             led2Bool = true;
-            btChannel.sendMessage("1");
+            btChannel.sendMessage("led2_1");
         }
     }
 
     private void toggleIrr() {
         if (irrMode) {
             irrMode = false;
-            btChannel.sendMessage("irr_CLOSE");
+            btChannel.sendMessage("irri_0");
+            irrCounter = 0;
+            irrCounterText.setText(String.valueOf(irrCounter));
         } else {
             irrMode = true;
-            btChannel.sendMessage("irr_OPEN");
+            btChannel.sendMessage("irri_1");
+            irrCounter = 1;
+            irrCounterText.setText(String.valueOf(irrCounter));
         }
-    }
-
-    private void requireManualControl() throws Exception {
-        // System.out.println("Required MANUAL control");
-        connectToBTServer();
     }
 
     private void connectToBTServer() throws Exception  {
@@ -284,14 +289,11 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void toggleBT() throws Exception {
         if (!btActive) {
-            requireManualControl();
-            Thread.sleep(2000);
+            connectToBTServer();
 
             btActive = true;
             // buttonRequireManualControl.setText("Close BT connection");
             setEnabledAllBtns(true);
-            mode = 1;
-            btChannel.sendMessage("M");
         } else {
             /*
             btActive = false;

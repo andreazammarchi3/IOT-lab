@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "ControllerTask.h"
 #include <SoftwareSerial.h>
 
@@ -5,6 +6,12 @@ extern bool onOffLights;
 extern int fadeLights;
 extern int irrigation;
 extern int mode;
+
+extern int led1BT;
+extern int led2BT;
+extern int led3BT;
+extern int led4BT;
+extern int irrigationBT;
 
 ServoTimer2 servo;
 
@@ -20,7 +27,6 @@ ControllerTask::ControllerTask() {
   pinMode(Rx, INPUT);
   pinMode(Tx, OUTPUT);
   servo.attach(SERVO_PIN);
-  //SoftPWMBegin(SOFTPWM_NORMAL);
 }
 
 // Initializer
@@ -38,19 +44,18 @@ void ControllerTask::tick() {
     case AUTO:
       if (periodCounter == 0) {
         servo.write(servoPosition);
-      } else if (periodCounter % 100 == 0) {  // Ogni mezzo secondo
-        //digitalWrite(LED3_PIN, HIGH);
-        //digitalWrite(LED4_PIN, HIGH);
+      } else if (periodCounter % 100 == 0) {
         if (mode == 1) {
           state = MANUAL;
+          periodCounter = 0;
+          break;
+        } else if (mode == 2) {
+          state = ALARM;
           periodCounter = 0;
           break;
         }
         // Update leds
         setOnOffLights(onOffLights);
-      } else {
-        //digitalWrite(LED3_PIN, LOW);
-        //digitalWrite(LED4_PIN, LOW);
       }
       if (periodCounter % ((5 - irrigation) * 200) == 0) {
         if(irrigation != 0) {
@@ -59,19 +64,58 @@ void ControllerTask::tick() {
         }
         periodCounter = 0;
       }
-      setFadeLights(fadeLights, periodCounter);
+      setFadeLight(fadeLights, periodCounter, LED3_PIN);
+      setFadeLight(fadeLights, periodCounter, LED4_PIN);
 
       periodCounter++;
       break;
 
     // MANUAL state: waiting for user input
     case MANUAL:
+      if (periodCounter % 100 == 0) {
+        if (mode == 0) {
+          state = AUTO;
+          periodCounter = 0;
+          break;
+        } else if (mode == 2) {
+          state = ALARM;
+          periodCounter = 0;
+          break;
+        }
+
+        digitalWrite(LED1_PIN, led1BT);
+        digitalWrite(LED2_PIN, led2BT);
+      }
+
+      if (periodCounter % ((5 - irrigationBT) * 200) == 0) {
+        if(irrigationBT != 0) {
+          // Update servo
+          updateServoPosition();
+        }
+        periodCounter = 0;
+      }
+
+      setFadeLight(led3BT, periodCounter, LED3_PIN);
+      setFadeLight(led4BT, periodCounter, LED4_PIN);
 
       periodCounter++;
       break;
 
     // ALARM state
     case ALARM:
+      if (periodCounter % 100 == 0) {
+        if (mode == 0) {
+          state = AUTO;
+          periodCounter = 0;
+          break;
+        } else if (mode == 1) {
+          state = MANUAL;
+          periodCounter = 0;
+          break;
+        }
+      } else {
+        
+      }
 
       periodCounter++;
       break;
@@ -88,15 +132,13 @@ void ControllerTask::setOnOffLights(bool value) {
   }
 }
 
-void ControllerTask::setFadeLights(int value, int periodCounter) {
+void ControllerTask::setFadeLight(int value, int periodCounter, int led) {
   if (fadeLights != 0) {
     int dc = periodCounter % (value);
     if (dc == 0) {
-      digitalWrite(LED3_PIN, HIGH);
-      digitalWrite(LED4_PIN, HIGH);
+      digitalWrite(led, HIGH);
     } else {
-      digitalWrite(LED3_PIN, LOW);
-      digitalWrite(LED4_PIN, LOW);
+      digitalWrite(led, LOW);
     }
   }
 }
