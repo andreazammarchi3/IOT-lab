@@ -39,7 +39,7 @@ void MsgTask::tick() {
         String value = cutValueFromStr(str, "fade_");
         fadeLights = value.toInt();
         if (fadeLights != 0) {
-          fadeLights = (6 - fadeLights) * 10;
+          fadeLights = fadeLights * 5;
         }
         MsgService.sendMsg(String(fadeLights));
      } else if (str.indexOf("irri_") >= 0) {

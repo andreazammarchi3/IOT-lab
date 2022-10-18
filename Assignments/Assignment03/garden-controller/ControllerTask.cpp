@@ -89,15 +89,15 @@ void ControllerTask::setOnOffLights(bool value) {
 }
 
 void ControllerTask::setFadeLights(int value, int periodCounter) {
-  //SoftPWMSet(LED3_PIN, value);
-  //SoftPWMSet(LED4_PIN, value);
-  int dc = periodCounter % (value/2);
-  if (dc == 0) {
-    digitalWrite(LED3_PIN, HIGH);
-    digitalWrite(LED4_PIN, HIGH);
-  } else {
-    digitalWrite(LED3_PIN, LOW);
-    digitalWrite(LED4_PIN, LOW);
+  if (fadeLights != 0) {
+    int dc = periodCounter % (value);
+    if (dc == 0) {
+      digitalWrite(LED3_PIN, HIGH);
+      digitalWrite(LED4_PIN, HIGH);
+    } else {
+      digitalWrite(LED3_PIN, LOW);
+      digitalWrite(LED4_PIN, LOW);
+    }
   }
 }
 
