@@ -20,48 +20,6 @@ void MsgTask::init(int period) {
 
 void MsgTask::tick() {
   if (mode != 2) {
-    if (MsgService.isMsgAvailable()) {
-      Msg* msg = MsgService.receiveMsg();
-      String str = msg->getContent();
-      if (str == "onOffLights") {
-        if (onOffLights) {
-          MsgService.sendMsg(String(1));
-        } else {
-          MsgService.sendMsg(String(0));
-        }
-      } else if (str == "fadeLights") {
-        MsgService.sendMsg(String(fadeLights));
-      } else if (str == "irrigation") {
-        MsgService.sendMsg(String(irrigation));
-      } else if (str.indexOf("leds_") >= 0) {
-        String value = cutValueFromStr(str, "leds_");
-        if (value == "0") {
-          onOffLights = false;
-        } else {
-          onOffLights = true;
-        }
-        MsgService.sendMsg(value);
-      } else if (str.indexOf("fade_") >= 0) {
-        String value = cutValueFromStr(str, "fade_");
-        fadeLights = value.toInt();
-        if (fadeLights != 0) {
-          fadeLights = fadeLights * 5;
-        }
-        MsgService.sendMsg(String(fadeLights));
-      } else if (str.indexOf("irri_") >= 0) {
-        String value = cutValueFromStr(str, "irri_");
-        irrigation = value.toInt();
-        MsgService.sendMsg(value);
-      } else if (str == "AUTO") {
-        mode = 0;
-      } else if (str == "MANUAL") {
-        mode = 1;
-      } else if (str == "ALARM") {
-        mode = 2;
-      }
-
-      delete msg;
-    }
     if (bt->isMsgAvailable()) {
       Msg1* msg1 = bt->receiveMsg();
       String strBT = msg1->getContent();
@@ -107,6 +65,48 @@ void MsgTask::tick() {
         mode = 2;
       }
       delete msg1;
+    }
+    if (MsgService.isMsgAvailable()) {
+      Msg* msg = MsgService.receiveMsg();
+      String str = msg->getContent();
+      if (str == "onOffLights") {
+        if (onOffLights) {
+          MsgService.sendMsg(String(1));
+        } else {
+          MsgService.sendMsg(String(0));
+        }
+      } else if (str == "fadeLights") {
+        MsgService.sendMsg(String(fadeLights));
+      } else if (str == "irrigation") {
+        MsgService.sendMsg(String(irrigation));
+      } else if (str.indexOf("leds_") >= 0) {
+        String value = cutValueFromStr(str, "leds_");
+        if (value == "0") {
+          onOffLights = false;
+        } else {
+          onOffLights = true;
+        }
+        MsgService.sendMsg(value);
+      } else if (str.indexOf("fade_") >= 0) {
+        String value = cutValueFromStr(str, "fade_");
+        fadeLights = value.toInt();
+        if (fadeLights != 0) {
+          fadeLights = fadeLights * 5;
+        }
+        MsgService.sendMsg(String(fadeLights));
+      } else if (str.indexOf("irri_") >= 0) {
+        String value = cutValueFromStr(str, "irri_");
+        irrigation = value.toInt();
+        MsgService.sendMsg(value);
+      } else if (str == "AUTO") {
+        mode = 0;
+      } else if (str == "MANUAL") {
+        mode = 1;
+      } else if (str == "ALARM") {
+        mode = 2;
+      }
+
+      delete msg;
     }
   } else {
     if (bt->isMsgAvailable()) {
