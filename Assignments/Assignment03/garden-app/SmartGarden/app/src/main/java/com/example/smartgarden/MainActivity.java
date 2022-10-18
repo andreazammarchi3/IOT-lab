@@ -1,12 +1,16 @@
 package com.example.smartgarden;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,12 +51,12 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonIrrigationMinus;
     private Button buttonIrrigationPlus;
     private Button buttonIrrigation;
-    private Button buttonRequireManualControl;
+    private TextView outText;
 
     // Bluetooth
     private BluetoothChannel btChannel;
 
-    @SuppressLint("MissingPermission")
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
         led3CounterText = findViewById(R.id.led_3_counter);
         led4CounterText = findViewById(R.id.led_4_counter);
         irrCounterText = findViewById(R.id.irrigation_counter);
+        outText = findViewById(R.id.outText);
 
-        buttonRequireManualControl = (Button)findViewById(R.id.button_require_manual_control);
+        Button buttonRequireManualControl = (Button) findViewById(R.id.button_require_manual_control);
         buttonRequireManualControl.setOnClickListener(view ->
                 {
                     try {
@@ -122,7 +127,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Bluetooth init
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(btAdapter != null && !btAdapter.isEnabled()){
+        if (btAdapter != null && !btAdapter.isEnabled()) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},1);
+            }
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), Bluetooth.bluetooth.ENABLE_BT_REQUEST);
         }
     }
@@ -137,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_alarm) {
             if (mode != 1) {
-                // System.out.println("Alarm btn clicked");
                 btChannel.sendMessage("MANUAL");
                 mode = 1;
             }
@@ -252,41 +259,35 @@ public class MainActivity extends AppCompatActivity {
         final UUID uuid = BluetoothUtils.generateUuidFromString("00001101-0000-1000-8000-00805F9B34FB");
 
         AsyncTask<Void, Void, Integer> execute = new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
-            @SuppressLint("MissingPermission")
             @Override
             public void onConnectionActive(final BluetoothChannel channel) {
-                System.out.println("Status : connected to server on device " + serverDevice.getName());
                 btChannel = channel;
                 btChannel.registerListener(new RealBluetoothChannel.Listener() {
                     @Override
                     public void onMessageReceived(String receivedMessage) {
-                        System.out.println("> [RECEIVED from " +
-                                btChannel.getRemoteDeviceName() +
-                                "] " +
-                                receivedMessage);
+                        outText.setText(String.format("> [RECEIVED from %s] %s\n",
+                                btChannel.getRemoteDeviceName(),
+                                receivedMessage));
                     }
 
                     @Override
                     public void onMessageSent(String sentMessage) {
-                        System.out.println("> [SENT to " +
-                                btChannel.getRemoteDeviceName() +
-                                "] " +
-                                sentMessage);
+                        outText.setText(String.format("> [SENT to %s] %s\n",
+                                btChannel.getRemoteDeviceName(),
+                                sentMessage));
                     }
                 });
             }
 
             @Override
             public void onConnectionCanceled() {
-                System.out.println("Status : unable to connect, device " +
-                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME +
-                        " not found!");
+                outText.setText(String.format("\nStatus : unable to connect, device %s not found!",
+                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME));
             }
         });
         execute.execute();
     }
 
-    @SuppressLint("SetTextI18n")
     private void toggleBT() throws Exception {
         if (!btActive) {
             connectToBTServer();
@@ -294,15 +295,6 @@ public class MainActivity extends AppCompatActivity {
             btActive = true;
             // buttonRequireManualControl.setText("Close BT connection");
             setEnabledAllBtns(true);
-        } else {
-            /*
-            btActive = false;
-
-            buttonRequireManualControl.setText("Require manual control");
-            setEnabledAllBtns(false);
-            mode = 0;
-
-            */
         }
     }
 

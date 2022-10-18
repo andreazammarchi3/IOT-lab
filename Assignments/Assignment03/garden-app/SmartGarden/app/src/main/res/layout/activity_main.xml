@@ -273,6 +273,14 @@
             android:gravity="bottom|center_horizontal"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/outText"
+                android:layout_width="245dp"
+                android:layout_height="126dp"
+                android:text="@string/irrigation_counter"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
             <Button
                 android:id="@+id/button_require_manual_control"
                 android:layout_width="wrap_content"
