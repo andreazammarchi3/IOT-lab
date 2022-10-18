@@ -1,6 +1,7 @@
 package com.example.smartgarden;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -298,5 +300,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Bluetooth.bluetooth.ENABLE_BT_REQUEST && resultCode == RESULT_OK) {
+            Log.d("BT CLN", "Bluetooth enabled!");
+        }
 
+        if (requestCode == 1 && resultCode == RESULT_CANCELED) {
+            Log.d("BT CLN", "Bluetooth not enabled!");
+        }
+    }
 }
