@@ -9,6 +9,7 @@
 
 class MsgTask: public Task {
     MsgServiceBT* bt;
+    int periodCounter;
 
   public:
     void init(int period);

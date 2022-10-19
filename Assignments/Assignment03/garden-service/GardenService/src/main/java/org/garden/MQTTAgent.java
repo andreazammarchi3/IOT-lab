@@ -5,12 +5,13 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.mqtt.MqttClient;
 
+import java.util.Objects;
+
 /*
  * MQTT Agent
  */
 public class MQTTAgent extends AbstractVerticle {
     private MqttClient client;
-
     private int temperature = -1;
     private int luminosity = -1;
 
@@ -28,9 +29,11 @@ public class MQTTAgent extends AbstractVerticle {
             log("subscribing...");
             client.publishHandler(s -> {
                         String data = s.payload().toString();
-                        System.out.println(s.topicName() + ": " + data);
-                        temperature = Integer.parseInt(data.split(", ")[0]);
-                        luminosity = Integer.parseInt(data.split(", ")[1]);
+                        if (!Objects.equals(data, "led_on") && !Objects.equals(data, "led_off")) {
+                            System.out.println(s.topicName() + ": " + data);
+                            temperature = Integer.parseInt(data.split(", ")[0]);
+                            luminosity = Integer.parseInt(data.split(", ")[1]);
+                        }
                     })
                     .subscribe("SmartGarden/data", 2);
 
@@ -43,6 +46,7 @@ public class MQTTAgent extends AbstractVerticle {
                     false,
                     false);
              */
+
         });
     }
 

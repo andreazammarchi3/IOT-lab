@@ -39,7 +39,6 @@ void ControllerTask::init(int period) {
 // Loop executed every ControllerTask period (50ms)
 void ControllerTask::tick() {
   switch (state) {
-
     // AUTO state
     case AUTO:
       if (periodCounter == 0) {
@@ -114,7 +113,11 @@ void ControllerTask::tick() {
           break;
         }
       } else {
-        
+        setOnOffLights(false);
+        digitalWrite(LED3_PIN, LOW);
+        digitalWrite(LED4_PIN, LOW);
+        servo.write(750);
+        servoPosition = 750;
       }
 
       periodCounter++;

@@ -1,7 +1,7 @@
 package org.garden;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public class GardenDashboardGUI {
 
@@ -14,11 +14,20 @@ public class GardenDashboardGUI {
 
     public GardenDashboardGUI() {
         JFrame mainFrame = new JFrame("GardenDashboard");
-        mainFrame.setSize(300, 300);
+        mainFrame.setSize(200, 200);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    GardenDashboard.close();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
         mainFrame.getContentPane().add(panel);
         panel.add(textAreaL);
         panel.add(textAreaT);
@@ -26,7 +35,7 @@ public class GardenDashboardGUI {
         panel.add(textAreaFadeLights);
         panel.add(textAreaIrrigation);
         panel.add(textAreaMode);
-
+        mainFrame.setResizable(false);
         mainFrame.setVisible(true);
     }
 

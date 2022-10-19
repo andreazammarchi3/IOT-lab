@@ -13,6 +13,7 @@ public class GardenService {
     private static final int SLEEP_IRRIGATION_TIME = 10;
 
     private static GardenSerialCommChannel controller;
+    private static MQTTAgent agent;
 
     private static int luminosity = -1;
     private static int temperature = -1;
@@ -49,78 +50,47 @@ public class GardenService {
 
         // Initialize the MQTT Agent
         Vertx vertx = Vertx.vertx();
-        MQTTAgent agent = new MQTTAgent();
+        agent = new MQTTAgent();
         vertx.deployVerticle(agent);
 
+        // Initialize the GUI
+        GardenServiceGUI gui = new GardenServiceGUI();
+
         while (true) {
-            Socket clientSocket = server.accept();
-            InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
-            BufferedReader reader = new BufferedReader(isr);
-            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
-            String line = reader.readLine();
-            while (!line.isEmpty()) {
-                // If dashboard is requesting data
-                if (line.equals("data")) {
-                    // Get data from sensor board
-                    luminosity = agent.getLuminosity();
-                    temperature = agent.getTemperature();
-
-                    // Send data to dashboard
-                    writer.println(
-                            luminosity + ", " +
-                            temperature + ", " +
-                            onOffLights + ", " +
-                            fadeLights + ", " +
-                            irrigation + ", " +
-                            mode.getValue()
-                    );
+            try {
+                Socket clientSocket = server.accept();
+                InputStreamReader isr = new InputStreamReader(clientSocket.getInputStream());
+                BufferedReader reader = new BufferedReader(isr);
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+                String line = reader.readLine();
+                while (!line.isEmpty()) {
+                    // If dashboard is requesting data
+                    if (line.equals("data")) {
+                        getDataFromSensorboard();
+                        // Send data to dashboard
+                        writer.println(
+                                luminosity + ", " +
+                                temperature + ", " +
+                                onOffLights + ", " +
+                                fadeLights + ", " +
+                                irrigation + ", " +
+                                mode.getValue()
+                        );
+                    }
+                    mainTask();
+                    line = reader.readLine();
                 }
-                switch (mode) {
-                    case AUTO -> {
-                        if (luminosity < 5) {
-                            onOffLights = true;
-                            controller.setOnOffLight(true);
-                            fadeLights = luminosity;
-                            controller.setFadeLights(luminosity);
-                            if (luminosity < 2) {
-                                if (sleepSecondsCounter == 0) {
-                                    keepIrrigating();
-                                } else {
-                                    keepSleeping();
-                                }
-                            } else {
-                                if (activitySecondsCounter != 0) {
-                                    keepIrrigating();
-                                }
-                                else if (sleepSecondsCounter != 0) {
-                                    keepSleeping();
-                                }
-                            }
-                        } else {
-                            onOffLights = false;
-                            controller.setOnOffLight(false);
-                            fadeLights = 0;
-                            controller.setFadeLights(0);
-                        }
-
-                        if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
-                            mode = Mode.ALARM;
-                            controller.setMode(mode.getValue());
-                        }
-                    }
-
-                    case MANUAL -> {
-                        System.out.println("MANUAL");
-                    }
-
-                    case ALARM -> {
-                        System.out.println("ALARM");
-                    }
-                }
-
-                line = reader.readLine();
+                close();
+            } catch (Exception e) {
+                close();
             }
         }
+    }
+
+    private static void getDataFromSensorboard() {
+        // Get data from sensor board
+        luminosity = agent.getLuminosity();
+        temperature = agent.getTemperature();
     }
 
     private static void keepIrrigating() throws Exception {
@@ -141,5 +111,58 @@ public class GardenService {
         if (sleepSecondsCounter == SLEEP_IRRIGATION_TIME) {
             sleepSecondsCounter = 0;
         }
+    }
+
+    private static void mainTask() throws Exception {
+        getDataFromSensorboard();
+        switch (mode) {
+            case AUTO -> {
+                if (luminosity < 5) {
+                    onOffLights = true;
+                    controller.setOnOffLight(true);
+                    fadeLights = luminosity;
+                    controller.setFadeLights(luminosity);
+                    if (luminosity < 2) {
+                        if (sleepSecondsCounter == 0) {
+                            keepIrrigating();
+                        } else {
+                            keepSleeping();
+                        }
+                    } else {
+                        if (activitySecondsCounter != 0) {
+                            keepIrrigating();
+                        }
+                        else if (sleepSecondsCounter != 0) {
+                            keepSleeping();
+                        }
+                    }
+                } else {
+                    onOffLights = false;
+                    controller.setOnOffLight(false);
+                    fadeLights = 0;
+                    controller.setFadeLights(0);
+                }
+
+                if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
+                    mode = Mode.ALARM;
+                    controller.setMode(mode.getValue());
+                    agent.setMode(Mode.ALARM.getValue());
+                } else {
+                    agent.setMode(Mode.AUTO.getValue());
+                }
+            }
+
+            case MANUAL -> {
+                System.out.println("MANUAL");
+            }
+
+            case ALARM -> {
+                System.out.println("ALARM");
+            }
+        }
+    }
+
+    public static void close() throws Exception {
+        System.exit(0);
     }
 }

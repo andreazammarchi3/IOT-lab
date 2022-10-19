@@ -65,12 +65,12 @@ void callback(char* topic, byte* message, unsigned int length) {
   // If a message is received on the topic, you check if the message is either "on" or "off". 
   // Changes the output state according to the message
   if (String(topic) == "SmartGarden/data") {
-    if(messageTemp == "led_ON"){
-      Serial.println("led_ON");
+    if(messageTemp == "led_on"){
+      //Serial.println("led_on");
       digitalWrite(ledPin, HIGH);
     }
-    else if(messageTemp == "led_OFF"){
-      Serial.println("led_OFF");
+    else if(messageTemp == "led_off"){
+      //Serial.println("led_off");
       digitalWrite(ledPin, LOW);
     }
   }
@@ -105,7 +105,6 @@ void reconnect() {
 
 int getTemp() {
   tempVal = analogRead(tempPin);
-  Serial.println(tempVal);
   tempVal = map(tempVal, 0, 4096, 1, 5);
   tempVal = int(tempVal);
   return tempVal;

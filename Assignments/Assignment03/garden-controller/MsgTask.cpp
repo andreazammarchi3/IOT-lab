@@ -16,6 +16,7 @@ void MsgTask::init(int period) {
   MsgService.init();
   bt = new MsgServiceBT();
   bt->init();
+  periodCounter = 0;
 }
 
 void MsgTask::tick() {
@@ -65,6 +66,7 @@ void MsgTask::tick() {
         mode = 2;
       }
       delete msg1;
+      periodCounter = 0;
     }
     if (MsgService.isMsgAvailable()) {
       Msg* msg = MsgService.receiveMsg();
@@ -107,14 +109,16 @@ void MsgTask::tick() {
       }
 
       delete msg;
+      periodCounter = 0;
     }
-  } else {
-    if (bt->isMsgAvailable()) {
-      Msg1* msg1 = bt->receiveMsg();
-      String strBT = msg1->getContent();
-      if (strBT == "MANUAL") {
-        mode = 1;
-      }
+  }
+
+  periodCounter++;
+  if (periodCounter == 10) {
+    mode = 2;
+    periodCounter = 0;
+    if (MsgService.isMsgAvailable()) {
+      mode = 0;
     }
   }
 }
