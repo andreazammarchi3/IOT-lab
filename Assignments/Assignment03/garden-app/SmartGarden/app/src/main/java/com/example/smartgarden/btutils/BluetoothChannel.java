@@ -1,19 +1,18 @@
-package com.example.smartgarden.utils;
+package com.example.smartgarden.btutils;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.example.smartgarden.utils.C.C;
+import com.example.smartgarden.btutils.utils.C;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BluetoothChannel implements CommChannel {
-
     private final List<Listener> listeners = new ArrayList<>();
-
-    BluetoothChannelHandler btChannelHandler = new BluetoothChannelHandler(Looper.getMainLooper());
+    private final BluetoothChannelHandler btChannelHandler =
+            new BluetoothChannelHandler(Looper.getMainLooper());
 
     ExtendedRunnable worker;
 
@@ -33,13 +32,17 @@ public abstract class BluetoothChannel implements CommChannel {
     }
 
     @Override
-    public void sendMessage(final String message){
+    public void sendMessage(final String message) {
         worker.write(message.getBytes());
-        // System.out.println("Message: " + message);
+    }
+
+    protected BluetoothChannelHandler getBTChannelHandler() {
+        return btChannelHandler;
     }
 
     /**
-     *
+     * Used for communication between the Main thread and one
+     * or more Worker threads (BluetoothChannel's workers).
      */
     class BluetoothChannelHandler extends Handler {
 
@@ -50,13 +53,13 @@ public abstract class BluetoothChannel implements CommChannel {
         @Override
         public void handleMessage(final Message message) {
 
-            if(message.what == C.channel.MESSSAGE_RECEIVED){
+            if(message.what == C.channel.MESSAGE_RECEIVED) {
                 for(Listener l : listeners){
                     l.onMessageReceived(new String((byte[])message.obj));
                 }
             }
 
-            if(message.what == C.channel.MESSAGE_SENT){
+            if(message.what == C.channel.MESSAGE_SENT) {
                 for(Listener l : listeners){
                     l.onMessageSent(new String((byte[])message.obj));
                 }
@@ -64,3 +67,4 @@ public abstract class BluetoothChannel implements CommChannel {
         }
     }
 }
+

@@ -10,7 +10,6 @@ public class GardenSerialCommChannel {
         channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
-        //update();
         System.out.println("Ready.");
     }
 

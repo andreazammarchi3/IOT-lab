@@ -14,16 +14,15 @@ extern int irrigationBT;
 void MsgTask::init(int period) {
   Task::init(period);
   MsgService.init();
-  bt = new MsgServiceBT();
-  bt->init();
+  MsgServiceBT.init();
   periodCounter = 0;
 }
 
 void MsgTask::tick() {
   if (mode != 2) {
-    if (bt->isMsgAvailable()) {
-      Msg1* msg1 = bt->receiveMsg();
-      String strBT = msg1->getContent();
+   if (MsgServiceBT.isMsgAvailable()) {
+      Msg* msg = MsgServiceBT.receiveMsg();
+      String strBT = msg->getContent();
       if (strBT.indexOf("led1_") >= 0) {
         String value = cutValueFromStr(strBT, "led1_");
         if (value == "0") {
@@ -31,7 +30,7 @@ void MsgTask::tick() {
         } else {
           led1BT = 0;
         }
-        bt->sendMsg(value);
+        MsgServiceBT.sendMsg(value);
       } else if (strBT.indexOf("led2_") >= 0) {
         String value = cutValueFromStr(strBT, "led2_");
         if (value == "0") {
@@ -39,25 +38,25 @@ void MsgTask::tick() {
         } else {
           led2BT = 0;
         }
-        bt->sendMsg(value);
+        MsgServiceBT.sendMsg(value);
       } else if (strBT.indexOf("led3_") >= 0) {
         String value = cutValueFromStr(strBT, "led3_");
         led3BT = value.toInt();
         if (led3BT != 0) {
           led3BT = led3BT * 5;
         }
-        bt->sendMsg(value);
+        MsgServiceBT.sendMsg(value);
       } else if (strBT.indexOf("led4_") >= 0) {
         String value = cutValueFromStr(strBT, "led4_");
         led4BT = value.toInt();
         if (led4BT != 0) {
           led4BT = led4BT * 5;
         }
-        bt->sendMsg(value);
+        MsgServiceBT.sendMsg(value);
       } else if (strBT.indexOf("irri_") >= 0) {
         String value = cutValueFromStr(strBT, "irri_");
         irrigationBT = value.toInt();
-        bt->sendMsg(value);
+        MsgServiceBT.sendMsg(value);
       } else if (strBT == "AUTO") {
         mode = 0;
       } else if (strBT == "MANUAL") {
@@ -65,8 +64,7 @@ void MsgTask::tick() {
       } else if (strBT == "ALARM") {
         mode = 2;
       }
-      delete msg1;
-      periodCounter = 0;
+      delete msg;
     }
     if (MsgService.isMsgAvailable()) {
       Msg* msg = MsgService.receiveMsg();
@@ -107,18 +105,22 @@ void MsgTask::tick() {
       } else if (str == "ALARM") {
         mode = 2;
       }
-
       delete msg;
-      periodCounter = 0;
     }
+    periodCounter = 0;
   }
 
   periodCounter++;
   if (periodCounter == 10) {
     mode = 2;
     periodCounter = 0;
-    if (MsgService.isMsgAvailable()) {
-      mode = 0;
+    if (MsgServiceBT.isMsgAvailable()) {
+      Msg* msg = MsgServiceBT.receiveMsg();
+      if (msg->getContent() == "MANUAL") {
+        mode=1;
+        MsgServiceBT.sendMsg("MANUAL");
+      }
+      delete msg;
     }
   }
 }

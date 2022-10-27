@@ -1,9 +1,8 @@
-package com.example.smartgarden.utils;
+package com.example.smartgarden.btutils;
 
 import android.os.AsyncTask;
 
 public abstract class ConnectionTask extends AsyncTask<Void, Void, Integer> {
-
     static final int CONNECTION_DONE = 1;
     static final int CONNECTION_CANCELED = 2;
 
@@ -27,7 +26,7 @@ public abstract class ConnectionTask extends AsyncTask<Void, Void, Integer> {
         }
     }
 
-    public interface EventListener{
+    public interface EventListener {
         void onConnectionActive(final BluetoothChannel channel);
         void onConnectionCanceled();
     }

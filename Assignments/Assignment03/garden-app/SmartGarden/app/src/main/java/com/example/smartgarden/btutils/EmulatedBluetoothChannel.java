@@ -1,43 +1,38 @@
-package com.example.smartgarden.utils;
+package com.example.smartgarden.btutils;
 
-import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothSocket;
 import android.os.Message;
 import android.util.Log;
 
-import com.example.smartgarden.utils.C.C;
+import com.example.smartgarden.btutils.utils.C;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.Arrays;
 
+public final class EmulatedBluetoothChannel extends BluetoothChannel {
 
-public final class RealBluetoothChannel extends BluetoothChannel {
-
-    private final String remoteDeviceName;
-
-    @SuppressLint("MissingPermission")
-    RealBluetoothChannel(BluetoothSocket socket){
-        remoteDeviceName = socket.getRemoteDevice().getName();
-
-        worker = new BluetoothWorker(socket);
+    EmulatedBluetoothChannel(Socket socket){
+        worker = new TcpWorker(socket);
         new Thread(worker).start();
     }
 
     @Override
     public String getRemoteDeviceName(){
-        return remoteDeviceName;
+        return "Arduino through PC";
     }
 
-
-    class BluetoothWorker implements ExtendedRunnable {
-        private final BluetoothSocket socket;
+    /**
+     *
+     */
+    private class TcpWorker implements ExtendedRunnable {
+        private final Socket socket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
 
-        BluetoothWorker(BluetoothSocket socket) {
+        TcpWorker(Socket socket) {
             this.socket = socket;
 
             InputStream tmpIn = null;
@@ -60,22 +55,10 @@ public final class RealBluetoothChannel extends BluetoothChannel {
 
         public void run() {
             while (true) {
-                /*byte[] buffer = new byte[1024];
-                int numBytes;
-
-                try {
-                    numBytes = inputStream.read(buffer);
-                    Message receivedMessage = btChannelHandler.obtainMessage(Bluetooth.channel.MESSSAGE_RECEIVED, numBytes, -1, buffer);
-                    receivedMessage.sendToTarget();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                }*/
-
                 try {
                     DataInputStream input = new DataInputStream(inputStream);
 
-                    StringBuffer readbuffer = new StringBuffer();
+                    StringBuilder readbuffer = new StringBuilder();
 
                     byte inputByte;
 
@@ -85,10 +68,15 @@ public final class RealBluetoothChannel extends BluetoothChannel {
                             readbuffer.append(chr);
                         } else {
                             String inputString = readbuffer.toString();
-                            Message receivedMessage = btChannelHandler.obtainMessage(C.channel.MESSSAGE_RECEIVED, inputString.getBytes().length, -1, inputString.getBytes());
+                            Message receivedMessage = getBTChannelHandler().obtainMessage(
+                                    C.channel.MESSAGE_RECEIVED,
+                                    inputString.getBytes().length,
+                                    -1,
+                                    inputString.getBytes()
+                            );
                             receivedMessage.sendToTarget();
 
-                            readbuffer = new StringBuffer();
+                            readbuffer = new StringBuilder();
                         }
                     }
                 }
@@ -105,7 +93,12 @@ public final class RealBluetoothChannel extends BluetoothChannel {
 
                 outputStream.write(bytesToBeSent);
 
-                Message writtenMsg = btChannelHandler.obtainMessage(C.channel.MESSAGE_SENT, -1, -1, bytes);
+                Message writtenMsg = getBTChannelHandler().obtainMessage(
+                        C.channel.MESSAGE_SENT,
+                        -1,
+                        -1,
+                        bytes
+                );
                 writtenMsg.sendToTarget();
             } catch (IOException e) {
                 e.printStackTrace();

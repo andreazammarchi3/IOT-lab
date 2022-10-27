@@ -1,33 +1,19 @@
 package com.example.smartgarden;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
-import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
-import android.bluetooth.BluetoothAdapter;
 
-import com.example.smartgarden.utils.Bluetooth;
-import com.example.smartgarden.utils.BluetoothChannel;
-import com.example.smartgarden.utils.BluetoothUtils;
-import com.example.smartgarden.utils.ConnectToBluetoothServerTask;
-import com.example.smartgarden.utils.ConnectionTask;
-import com.example.smartgarden.utils.RealBluetoothChannel;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.UUID;
+import com.example.smartgarden.btutils.BluetoothChannel;
+import com.example.smartgarden.btutils.ConnectToEmulatedBluetoothServerTask;
+import com.example.smartgarden.btutils.ConnectionTask;
+import com.example.smartgarden.btutils.EmulatedBluetoothChannel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,22 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private int mode = 0;
     private boolean irrMode = false;
     private int irrCounter = 0;
-    private boolean btActive = false;
-
-    // GUI
-    private TextView led3CounterText;
-    private TextView led4CounterText;
-    private TextView irrCounterText;
-    private Button buttonLed1;
-    private Button buttonLed2;
-    private Button buttonLed3Plus;
-    private Button buttonLed3Minus;
-    private Button buttonLed4Plus;
-    private Button buttonLed4Minus;
-    private Button buttonIrrigationMinus;
-    private Button buttonIrrigationPlus;
-    private Button buttonIrrigation;
-    private TextView outText;
 
     // Bluetooth
     private BluetoothChannel btChannel;
@@ -63,78 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        led3CounterText = findViewById(R.id.led_3_counter);
-        led4CounterText = findViewById(R.id.led_4_counter);
-        irrCounterText = findViewById(R.id.irrigation_counter);
-        outText = findViewById(R.id.outText);
-
-        Button buttonRequireManualControl = (Button) findViewById(R.id.button_require_manual_control);
-        buttonRequireManualControl.setOnClickListener(view ->
-                {
-                    try {
-                        toggleBT();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-        );
-
-        buttonLed1 = findViewById(R.id.button_led_1);
-        buttonLed1.setOnClickListener(view ->
-                toggleLed1()
-        );
-
-        buttonLed2 = findViewById(R.id.button_led_2);
-        buttonLed2.setOnClickListener(view ->
-                toggleLed2()
-        );
-
-        buttonLed3Plus = findViewById(R.id.button_led_3_plus);
-        buttonLed3Plus.setOnClickListener(view ->
-                incLed3()
-        );
-
-        buttonLed3Minus = findViewById(R.id.button_led_3_minus);
-        buttonLed3Minus.setOnClickListener(view ->
-                decLed3()
-        );
-
-        buttonLed4Plus = findViewById(R.id.button_led_4_plus);
-        buttonLed4Plus.setOnClickListener(view ->
-                incLed4()
-        );
-
-        buttonLed4Minus = findViewById(R.id.button_led_4_minus);
-        buttonLed4Minus.setOnClickListener(view ->
-                decLed4()
-        );
-
-        buttonIrrigationMinus = findViewById(R.id.button_irrigation_minus);
-        buttonIrrigationMinus.setOnClickListener(view ->
-                decIrr()
-        );
-
-        buttonIrrigationPlus = findViewById(R.id.button_irrigation_plus);
-        buttonIrrigationPlus.setOnClickListener(view ->
-                incIrr()
-        );
-
-        buttonIrrigation = findViewById(R.id.button_irrigation);
-        buttonIrrigation.setOnClickListener(view ->
-                toggleIrr()
-        );
-
-        setEnabledAllBtns(false);
-
-        // Bluetooth init
-        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter != null && !btAdapter.isEnabled()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},1);
-            }
-            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), Bluetooth.bluetooth.ENABLE_BT_REQUEST);
-        }
+        initUI();
     }
 
     @Override
@@ -146,169 +45,179 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_alarm) {
-            if (mode != 1) {
-                btChannel.sendMessage("MANUAL");
+            if (mode == 2) {
+                sendMessage("MANUAL");
                 mode = 1;
             }
         }
         return true;
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        btChannel.close();
+    }
+
     private void setEnabledAllBtns(Boolean state) {
-        buttonLed1.setEnabled(state);
-        buttonLed2.setEnabled(state);
-        buttonLed3Minus.setEnabled(state);
-        buttonLed3Plus.setEnabled(state);
-        buttonLed4Minus.setEnabled(state);
-        buttonLed4Plus.setEnabled(state);
-        buttonIrrigation.setEnabled(state);
-        buttonIrrigationMinus.setEnabled(state);
-        buttonIrrigationPlus.setEnabled(state);
+        findViewById(R.id.button_led_1).setEnabled(state);
+        findViewById(R.id.button_led_2).setEnabled(state);
+        findViewById(R.id.button_led_3_minus).setEnabled(state);
+        findViewById(R.id.button_led_3_plus).setEnabled(state);
+        findViewById(R.id.button_led_4_minus).setEnabled(state);
+        findViewById(R.id.button_led_4_plus).setEnabled(state);
+        findViewById(R.id.button_irrigation).setEnabled(state);
+        findViewById(R.id.button_irrigation_minus).setEnabled(state);
+        findViewById(R.id.button_irrigation_plus).setEnabled(state);
 
     }
 
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
-            btChannel.sendMessage("led3_" + led3Counter);
+            sendMessage("led3_" + led3Counter);
         }
-        led3CounterText.setText(String.valueOf(led3Counter));
+        ((TextView)findViewById(R.id.led_3_counter)).setText(String.valueOf(led3Counter));
     }
 
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
-            btChannel.sendMessage("led4_" + led4Counter);
+            sendMessage("led4_" + led4Counter);
         }
-        led4CounterText.setText(String.valueOf(led4Counter));
+        ((TextView)findViewById(R.id.led_4_counter)).setText(String.valueOf(led4Counter));
     }
 
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
-            btChannel.sendMessage("irri_" + irrCounter);
+            sendMessage("irri_" + irrCounter);
             irrMode = true;
         }
-        irrCounterText.setText(String.valueOf(irrCounter));
+        ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
     }
 
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
-            btChannel.sendMessage("led3_" + led3Counter);
+            sendMessage("led3_" + led3Counter);
         }
-        led3CounterText.setText(String.valueOf(led3Counter));
+        ((TextView)findViewById(R.id.led_3_counter)).setText(String.valueOf(led3Counter));
     }
 
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
-            btChannel.sendMessage("led4_" + led4Counter);
+            sendMessage("led4_" + led4Counter);
         }
-        led4CounterText.setText(String.valueOf(led4Counter));
+        ((TextView)findViewById(R.id.led_4_counter)).setText(String.valueOf(led4Counter));
     }
 
     private void decIrr() {
         if (irrCounter > 1) {
             irrCounter--;
-            btChannel.sendMessage("irri_" + irrCounter);
+            sendMessage("irri_" + irrCounter);
             irrMode = true;
         }
-        irrCounterText.setText(String.valueOf(irrCounter));
+        ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
     }
 
     private void toggleLed1() {
         if (mode == 0) {
             mode = 1;
-            btChannel.sendMessage("MANUAL");
+            sendMessage("MANUAL");
         }
         if (led1Bool) {
             led1Bool = false;
-            btChannel.sendMessage("led1_0");
+            sendMessage("led1_0");
         } else {
             led1Bool = true;
-            btChannel.sendMessage("led1_1");
+            sendMessage("led1_1");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            btChannel.sendMessage("led2_0");
+            sendMessage("led2_0");
         } else {
             led2Bool = true;
-            btChannel.sendMessage("led2_1");
+            sendMessage("led2_1");
         }
     }
 
     private void toggleIrr() {
         if (irrMode) {
             irrMode = false;
-            btChannel.sendMessage("irri_0");
+            sendMessage("irri_0");
             irrCounter = 0;
-            irrCounterText.setText(String.valueOf(irrCounter));
+            ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
         } else {
             irrMode = true;
-            btChannel.sendMessage("irri_1");
+            sendMessage("irri_1");
             irrCounter = 1;
-            irrCounterText.setText(String.valueOf(irrCounter));
+            ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
         }
     }
 
-    private void connectToBTServer() throws Exception  {
-        final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByAddress("98:D3:31:20:44:12");
-        // final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
-        final UUID uuid = BluetoothUtils.generateUuidFromString("00001101-0000-1000-8000-00805F9B34FB");
-
-        AsyncTask<Void, Void, Integer> execute = new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
+    private void connectToBTServer() {
+        new ConnectToEmulatedBluetoothServerTask(new ConnectionTask.EventListener() {
             @Override
             public void onConnectionActive(final BluetoothChannel channel) {
+                findViewById(R.id.button_require_manual_control).setEnabled(false);
+                setEnabledAllBtns(true);
                 btChannel = channel;
-                btChannel.registerListener(new RealBluetoothChannel.Listener() {
+                btChannel.registerListener(new EmulatedBluetoothChannel.Listener() {
                     @Override
                     public void onMessageReceived(String receivedMessage) {
-                        outText.setText(String.format("> [RECEIVED from %s] %s\n",
+                        ((TextView) findViewById(R.id.outText)).append(String.format(
+                                "> [RECEIVED from %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
-                                receivedMessage));
+                                receivedMessage
+                        ));
                     }
 
                     @Override
                     public void onMessageSent(String sentMessage) {
-                        outText.setText(String.format("> [SENT to %s] %s\n",
+                        ((TextView) findViewById(R.id.outText)).append(String.format(
+                                "> [SENT to %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
-                                sentMessage));
+                                sentMessage
+                        ));
                     }
                 });
             }
 
             @Override
             public void onConnectionCanceled() {
-                outText.setText(String.format("\nStatus : unable to connect, device %s not found!",
-                        Bluetooth.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME));
+                ((TextView) findViewById(R.id.outText)).setText(String.format(
+                        "Status : unable to connect, device %s not found!",
+                        "host machine"
+                ));
             }
-        });
-        execute.execute();
+        }).execute();
     }
 
-    private void toggleBT() throws Exception {
-        if (!btActive) {
+    private void sendMessage(final String message) {
+        new Thread(() -> btChannel.sendMessage(message)).start();
+    }
+
+    private void initUI() {
+        findViewById(R.id.button_require_manual_control).setOnClickListener(l -> {
+            findViewById(R.id.button_require_manual_control).setEnabled(false);
             connectToBTServer();
+        });
+        findViewById(R.id.button_led_1).setOnClickListener(view -> toggleLed1());
+        findViewById(R.id.button_led_2).setOnClickListener(view -> toggleLed2());
+        findViewById(R.id.button_led_3_plus).setOnClickListener(view -> incLed3());
+        findViewById(R.id.button_led_3_minus).setOnClickListener(view -> decLed3());
+        findViewById(R.id.button_led_4_plus).setOnClickListener(view -> incLed4());
+        findViewById(R.id.button_led_4_minus).setOnClickListener(view -> decLed4());
+        findViewById(R.id.button_irrigation_minus).setOnClickListener(view -> decIrr());
+        findViewById(R.id.button_irrigation_plus).setOnClickListener(view -> incIrr());
+        findViewById(R.id.button_irrigation).setOnClickListener(view -> toggleIrr());
 
-            btActive = true;
-            // buttonRequireManualControl.setText("Close BT connection");
-            setEnabledAllBtns(true);
-        }
+        setEnabledAllBtns(false);
     }
 
-    @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Bluetooth.bluetooth.ENABLE_BT_REQUEST && resultCode == RESULT_OK) {
-            Log.d("BT CLN", "Bluetooth enabled!");
-        }
-
-        if (requestCode == 1 && resultCode == RESULT_CANCELED) {
-            Log.d("BT CLN", "Bluetooth not enabled!");
-        }
-    }
 }

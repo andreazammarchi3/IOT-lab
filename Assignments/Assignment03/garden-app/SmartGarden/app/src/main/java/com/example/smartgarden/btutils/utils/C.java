@@ -1,10 +1,10 @@
-package com.example.smartgarden.utils.C;
+package com.example.smartgarden.btutils.utils;
 
 public class C {
     public static final String LIB_TAG = "BluetoothLib";
 
     public class channel {
-        public static final int MESSSAGE_RECEIVED = 0;
+        public static final int MESSAGE_RECEIVED = 0;
         public static final int MESSAGE_SENT = 1;
     }
 

@@ -4,11 +4,9 @@
 #include <String.h>
 #include "Task.h"
 #include "MsgService.h"
-#include "MsgServiceBT.h"
 #include "define.h"
 
 class MsgTask: public Task {
-    MsgServiceBT* bt;
     int periodCounter;
 
   public:

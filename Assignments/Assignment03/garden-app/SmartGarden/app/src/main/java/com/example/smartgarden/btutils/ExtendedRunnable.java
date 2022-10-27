@@ -1,4 +1,4 @@
-package com.example.smartgarden.utils;
+package com.example.smartgarden.btutils;
 
 public interface ExtendedRunnable extends Runnable {
     void write(byte[] bytes);
