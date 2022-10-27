@@ -16,14 +16,13 @@ public class GardenSerialCommChannel {
         System.out.println("Ready.");
     }
 
-    public void getSerialData(String inputMsg) throws Exception {
+    public void sendSerialData(String inputMsg) throws Exception {
         channel.sendMsg(inputMsg);
-        channel.receiveMsg();
+        // channel.receiveMsg();
     }
 
-
     public void setIrrigation(int value) throws Exception {
-        getSerialData("irri_" + value);
+        sendSerialData("irri_" + value);
     }
 
     public void setOnOffLight(boolean value) throws Exception {
@@ -33,29 +32,29 @@ public class GardenSerialCommChannel {
         } else {
             msg = "leds_" + 0;
         }
-        getSerialData(msg);
+        sendSerialData(msg);
     }
 
     public void setFadeLights(int value) throws Exception {
-        getSerialData("fade_" + value);
+        sendSerialData("fade_" + value);
     }
 
     public void setMode(int value) throws Exception {
         switch (value) {
             case 0 -> {
-                getSerialData("AUTO");
+                sendSerialData("AUTO");
             }
             case 1 -> {
-                getSerialData("MANUAL");
+                sendSerialData("MANUAL");
             }
             case 2 -> {
-                getSerialData("ALARM");
+                sendSerialData("ALARM");
             }
         }
     }
 
     public void close() throws Exception {
-        getSerialData("CLOSE");
+        sendSerialData("CLOSE");
         channel.close();
     }
 }

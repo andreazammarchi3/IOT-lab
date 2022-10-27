@@ -3,8 +3,6 @@
 #define LED3_PIN 10
 #define LED4_PIN 9
 #define SERVO_PIN 5
-#define Rx 2
-#define Tx 3
 
 #define SCHED_PERIOD 1
 #define MSG_TASK_PERIOD 500

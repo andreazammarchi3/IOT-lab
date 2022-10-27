@@ -1,6 +1,5 @@
 #include "Arduino.h"
 #include "ControllerTask.h"
-#include <SoftwareSerial.h>
 
 extern bool onOffLights;
 extern int fadeLights;
@@ -24,8 +23,6 @@ ControllerTask::ControllerTask() {
   pinMode(LED2_PIN, OUTPUT);
   pinMode(LED3_PIN, OUTPUT);
   pinMode(LED4_PIN, OUTPUT);
-  pinMode(Rx, INPUT);
-  pinMode(Tx, OUTPUT);
   servo.attach(SERVO_PIN);
 }
 

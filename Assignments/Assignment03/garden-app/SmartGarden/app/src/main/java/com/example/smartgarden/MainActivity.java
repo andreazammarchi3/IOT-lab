@@ -123,10 +123,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void toggleLed1() {
-        if (mode == 0) {
-            mode = 1;
-            sendMessage("MANUAL");
-        }
         if (led1Bool) {
             led1Bool = false;
             sendMessage("led1_0");
@@ -170,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 btChannel.registerListener(new EmulatedBluetoothChannel.Listener() {
                     @Override
                     public void onMessageReceived(String receivedMessage) {
+                        ((TextView) findViewById(R.id.outText)).setText("");
                         ((TextView) findViewById(R.id.outText)).append(String.format(
                                 "> [RECEIVED from %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
@@ -179,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onMessageSent(String sentMessage) {
+                        ((TextView) findViewById(R.id.outText)).setText("");
                         ((TextView) findViewById(R.id.outText)).append(String.format(
                                 "> [SENT to %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
@@ -186,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                         ));
                     }
                 });
+                sendMessage("MANUAL");
             }
 
             @Override
