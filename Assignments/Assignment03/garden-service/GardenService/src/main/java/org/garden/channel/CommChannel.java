@@ -1,4 +1,4 @@
-package org.garden;
+package org.garden.channel;
 
 /**
  * Simple interface for an async msg communication channel
@@ -29,4 +29,5 @@ public interface CommChannel {
      * @return
      */
     boolean isMsgAvailable();
+
 }

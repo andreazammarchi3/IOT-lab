@@ -1,13 +1,16 @@
 package org.garden;
 
+import org.garden.channel.CommChannel;
+import org.garden.channel.ExtendedSerialCommChannel;
+
 public class GardenSerialCommChannel {
     /**
      * Serial Communication Channel
      */
-    private final SerialCommChannel channel;
+    private final ExtendedSerialCommChannel channel;
 
     public GardenSerialCommChannel() throws Exception {
-        channel = new SerialCommChannel("/dev/cu.usbmodem14101", 9600);
+        channel = new ExtendedSerialCommChannel("/dev/cu.usbmodem14201", 9600, 8080);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
         System.out.println("Ready.");
