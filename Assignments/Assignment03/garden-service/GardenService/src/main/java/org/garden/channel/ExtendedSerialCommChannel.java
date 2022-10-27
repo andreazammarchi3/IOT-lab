@@ -14,22 +14,15 @@ import jssc.*;
  */
 public class ExtendedSerialCommChannel implements CommChannel, SerialPortEventListener {
 
-    private SerialPort serialPort;
-    private BlockingQueue<String> queue;
-    private StringBuffer currentMsg = new StringBuffer("");
-    private int localIPportEmu;
-    private static final int SERVER_PORT = 8080;
+    private final SerialPort serialPort;
+    private final BlockingQueue<String> queue;
+    private StringBuffer currentMsg = new StringBuffer();
 
     private AndroidEmulatorCommChannel androidEmulatorChannel;
     private static final char BT_MESSAGES_ID = '$';
 
-    public ExtendedSerialCommChannel(String port, int rate) throws Exception {
-        this(port, rate, SERVER_PORT);
-    }
-
-    public ExtendedSerialCommChannel(String port, int rate, int localIPportEmu) throws Exception {
-        queue = new ArrayBlockingQueue<String>(100);
-        this.localIPportEmu = localIPportEmu;
+    public ExtendedSerialCommChannel(String port, int rate, int localIPportEmu) {
+        queue = new ArrayBlockingQueue<>(100);
 
         serialPort = new SerialPort(port);
         try {
@@ -132,7 +125,7 @@ public class ExtendedSerialCommChannel implements CommChannel, SerialPortEventLi
                             queue.put(msg2.substring(0, index));
                         }
 
-                        currentMsg = new StringBuffer("");
+                        currentMsg = new StringBuffer();
                         if (index + 1 < msg2.length()) {
                             currentMsg.append(msg2.substring(index + 1));
                         }
@@ -151,7 +144,7 @@ public class ExtendedSerialCommChannel implements CommChannel, SerialPortEventLi
 
     class AndroidEmulatorCommChannel extends Thread {
 
-        private ServerSocket server;
+        private final ServerSocket server;
         private Socket socket;
 
         public AndroidEmulatorCommChannel(int port) throws IOException {

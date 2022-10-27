@@ -30,7 +30,7 @@ void MsgTask::tick() {
         } else {
           led1BT = 0;
         }
-        MsgServiceBT.sendMsg(value);
+        MsgService.sendMsg("led1_" + value);
       } else if (strBT.indexOf("led2_") >= 0) {
         String value = cutValueFromStr(strBT, "led2_");
         if (value == "0") {
@@ -38,31 +38,28 @@ void MsgTask::tick() {
         } else {
           led2BT = 0;
         }
-        MsgServiceBT.sendMsg(value);
+        MsgService.sendMsg("led2_" + value);
       } else if (strBT.indexOf("led3_") >= 0) {
         String value = cutValueFromStr(strBT, "led3_");
         led3BT = value.toInt();
         if (led3BT != 0) {
           led3BT = led3BT * 5;
         }
-        MsgServiceBT.sendMsg(value);
+        MsgService.sendMsg("led3_" + value);
       } else if (strBT.indexOf("led4_") >= 0) {
         String value = cutValueFromStr(strBT, "led4_");
         led4BT = value.toInt();
         if (led4BT != 0) {
           led4BT = led4BT * 5;
         }
-        MsgServiceBT.sendMsg(value);
+        MsgService.sendMsg("led4_" + value);
       } else if (strBT.indexOf("irri_") >= 0) {
         String value = cutValueFromStr(strBT, "irri_");
         irrigationBT = value.toInt();
-        MsgServiceBT.sendMsg(value);
-      } else if (strBT == "AUTO") {
-        mode = 0;
+        MsgService.sendMsg("irri_" + value);
       } else if (strBT == "MANUAL") {
         mode = 1;
-      } else if (strBT == "ALARM") {
-        mode = 2;
+        MsgService.sendMsg("MANUAL");
       }
       delete msg;
     }

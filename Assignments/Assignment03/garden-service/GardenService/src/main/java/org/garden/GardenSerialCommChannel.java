@@ -1,6 +1,5 @@
 package org.garden;
 
-import org.garden.channel.CommChannel;
 import org.garden.channel.ExtendedSerialCommChannel;
 
 public class GardenSerialCommChannel {
@@ -16,44 +15,35 @@ public class GardenSerialCommChannel {
         System.out.println("Ready.");
     }
 
-    public void sendSerialData(String inputMsg) throws Exception {
+    public void sendSerialData(String inputMsg) {
         channel.sendMsg(inputMsg);
-        // channel.receiveMsg();
     }
 
-    public void setIrrigation(int value) throws Exception {
+    public String getSerialData() throws InterruptedException {
+        if (channel.isMsgAvailable()) {
+            return channel.receiveMsg();
+        } else {
+            return "empty";
+        }
+    }
+
+    public void setIrrigation(int value) {
         sendSerialData("irri_" + value);
     }
 
-    public void setOnOffLight(boolean value) throws Exception {
-        String msg;
-        if (value) {
-            msg = "leds_" + 1;
-        } else {
-            msg = "leds_" + 0;
-        }
-        sendSerialData(msg);
+    public void setLed(int value, int led) {
+        sendSerialData("led" + led + "_" + value);
     }
 
-    public void setFadeLights(int value) throws Exception {
-        sendSerialData("fade_" + value);
-    }
-
-    public void setMode(int value) throws Exception {
+    public void setMode(int value) {
         switch (value) {
-            case 0 -> {
-                sendSerialData("AUTO");
-            }
-            case 1 -> {
-                sendSerialData("MANUAL");
-            }
-            case 2 -> {
-                sendSerialData("ALARM");
-            }
+            case 0 -> sendSerialData("AUTO");
+            case 1 -> sendSerialData("MANUAL");
+            case 2 -> sendSerialData("ALARM");
         }
     }
 
-    public void close() throws Exception {
+    public void close() {
         sendSerialData("CLOSE");
         channel.close();
     }

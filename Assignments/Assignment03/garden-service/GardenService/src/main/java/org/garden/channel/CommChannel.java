@@ -12,7 +12,6 @@ public interface CommChannel {
      *
      * Asynchronous model.
      *
-     * @param msg
      */
     void sendMsg(String msg);
 
@@ -26,7 +25,6 @@ public interface CommChannel {
     /**
      * To check if a message is available.
      *
-     * @return
      */
     boolean isMsgAvailable();
 
