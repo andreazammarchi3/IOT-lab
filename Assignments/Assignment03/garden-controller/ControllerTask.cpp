@@ -1,16 +1,12 @@
 #include "Arduino.h"
 #include "ControllerTask.h"
 
-extern bool onOffLights;
-extern int fadeLights;
+extern int led1;
+extern int led2;
+extern int led3;
+extern int led4;
 extern int irrigation;
 extern int mode;
-
-extern int led1BT;
-extern int led2BT;
-extern int led3BT;
-extern int led4BT;
-extern int irrigationBT;
 
 ServoTimer2 servo;
 
@@ -51,7 +47,8 @@ void ControllerTask::tick() {
           break;
         }
         // Update leds
-        setOnOffLights(onOffLights);
+        digitalWrite(LED1_PIN, led1);
+        digitalWrite(LED2_PIN, led2);
       }
       if (periodCounter % ((5 - irrigation) * 200) == 0) {
         if(irrigation != 0) {
@@ -60,8 +57,8 @@ void ControllerTask::tick() {
         }
         periodCounter = 0;
       }
-      setFadeLight(fadeLights, periodCounter, LED3_PIN);
-      setFadeLight(fadeLights, periodCounter, LED4_PIN);
+      setFadeLight(led3, periodCounter, LED3_PIN);
+      setFadeLight(led4, periodCounter, LED4_PIN);
 
       periodCounter++;
       break;
@@ -79,20 +76,20 @@ void ControllerTask::tick() {
           break;
         }
 
-        digitalWrite(LED1_PIN, led1BT);
-        digitalWrite(LED2_PIN, led2BT);
+        digitalWrite(LED1_PIN, led1);
+        digitalWrite(LED2_PIN, led2);
       }
 
-      if (periodCounter % ((5 - irrigationBT) * 200) == 0) {
-        if(irrigationBT != 0) {
+      if (periodCounter % ((5 - irrigation) * 200) == 0) {
+        if(irrigation != 0) {
           // Update servo
           updateServoPosition();
         }
         periodCounter = 0;
       }
 
-      setFadeLight(led3BT, periodCounter, LED3_PIN);
-      setFadeLight(led4BT, periodCounter, LED4_PIN);
+      setFadeLight(led3, periodCounter, LED3_PIN);
+      setFadeLight(led4, periodCounter, LED4_PIN);
 
       periodCounter++;
       break;
@@ -110,7 +107,8 @@ void ControllerTask::tick() {
           break;
         }
       } else {
-        setOnOffLights(false);
+        digitalWrite(LED1_PIN, LOW);
+        digitalWrite(LED2_PIN, LOW);
         digitalWrite(LED3_PIN, LOW);
         digitalWrite(LED4_PIN, LOW);
         servo.write(750);
@@ -122,18 +120,8 @@ void ControllerTask::tick() {
   }
 }
 
-void ControllerTask::setOnOffLights(bool value) {
-  if (value) {
-    digitalWrite(LED1_PIN, HIGH);
-    digitalWrite(LED2_PIN, HIGH);
-  } else {
-    digitalWrite(LED1_PIN, LOW);
-    digitalWrite(LED2_PIN, LOW);
-  }
-}
-
 void ControllerTask::setFadeLight(int value, int periodCounter, int led) {
-  if (fadeLights != 0) {
+  if (value != 0) {
     int dc = periodCounter % (value);
     if (dc == 0) {
       digitalWrite(led, HIGH);

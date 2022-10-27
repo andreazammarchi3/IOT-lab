@@ -1,15 +1,11 @@
 #include "MsgTask.h"
 
-extern bool onOffLights;
-extern int fadeLights;
+extern int led1;
+extern int led2;
+extern int led3;
+extern int led4;
 extern int irrigation;
 extern int mode;
-
-extern int led1BT;
-extern int led2BT;
-extern int led3BT;
-extern int led4BT;
-extern int irrigationBT;
 
 void MsgTask::init(int period) {
   Task::init(period);
@@ -25,37 +21,29 @@ void MsgTask::tick() {
       String strBT = msg->getContent();
       if (strBT.indexOf("led1_") >= 0) {
         String value = cutValueFromStr(strBT, "led1_");
-        if (value == "0") {
-          led1BT = 1;
-        } else {
-          led1BT = 0;
-        }
+        led1 = value.toInt();
         MsgService.sendMsg("led1_" + value);
       } else if (strBT.indexOf("led2_") >= 0) {
         String value = cutValueFromStr(strBT, "led2_");
-        if (value == "0") {
-          led2BT = 1;
-        } else {
-          led2BT = 0;
-        }
+        led2 = value.toInt();
         MsgService.sendMsg("led2_" + value);
       } else if (strBT.indexOf("led3_") >= 0) {
         String value = cutValueFromStr(strBT, "led3_");
-        led3BT = value.toInt();
-        if (led3BT != 0) {
-          led3BT = led3BT * 5;
+        led3 = value.toInt();
+        if (led3 != 0) {
+          led3 = led3 * 5;
         }
         MsgService.sendMsg("led3_" + value);
       } else if (strBT.indexOf("led4_") >= 0) {
         String value = cutValueFromStr(strBT, "led4_");
-        led4BT = value.toInt();
-        if (led4BT != 0) {
-          led4BT = led4BT * 5;
+        led4 = value.toInt();
+        if (led4 != 0) {
+          led4 = led4 * 5;
         }
         MsgService.sendMsg("led4_" + value);
       } else if (strBT.indexOf("irri_") >= 0) {
         String value = cutValueFromStr(strBT, "irri_");
-        irrigationBT = value.toInt();
+        irrigation = value.toInt();
         MsgService.sendMsg("irri_" + value);
       } else if (strBT == "MANUAL") {
         mode = 1;
@@ -66,35 +54,26 @@ void MsgTask::tick() {
     if (MsgService.isMsgAvailable()) {
       Msg* msg = MsgService.receiveMsg();
       String str = msg->getContent();
-      if (str == "onOffLights") {
-        if (onOffLights) {
-          MsgService.sendMsg(String(1));
-        } else {
-          MsgService.sendMsg(String(0));
-        }
-      } else if (str == "fadeLights") {
-        MsgService.sendMsg(String(fadeLights));
-      } else if (str == "irrigation") {
-        MsgService.sendMsg(String(irrigation));
-      } else if (str.indexOf("leds_") >= 0) {
-        String value = cutValueFromStr(str, "leds_");
-        if (value == "0") {
-          onOffLights = false;
-        } else {
-          onOffLights = true;
-        }
-        MsgService.sendMsg(value);
-      } else if (str.indexOf("fade_") >= 0) {
-        String value = cutValueFromStr(str, "fade_");
-        fadeLights = value.toInt();
-        if (fadeLights != 0) {
-          fadeLights = fadeLights * 5;
-        }
-        MsgService.sendMsg(String(fadeLights));
+      if (str.indexOf("led1_") >= 0) {
+        String value = cutValueFromStr(str, "led1_");
+        led1 = value.toInt();
+        MsgService.sendMsg("led1_" + value);
+      } else if (str.indexOf("led2_") >= 0) {
+        String value = cutValueFromStr(str, "led2_");
+        led2 = value.toInt();
+        MsgService.sendMsg("led2_" + value);
+      } else if (str.indexOf("led3_") >= 0) {
+        String value = cutValueFromStr(str, "led3_");
+        led3 = value.toInt();
+        MsgService.sendMsg("led3_" + value);
+      } else if (str.indexOf("led4_") >= 0) {
+        String value = cutValueFromStr(str, "led4_");
+        led4 = value.toInt();
+        MsgService.sendMsg("led4_" + value);
       } else if (str.indexOf("irri_") >= 0) {
         String value = cutValueFromStr(str, "irri_");
         irrigation = value.toInt();
-        MsgService.sendMsg(value);
+        MsgService.sendMsg("irri_" + value);
       } else if (str == "AUTO") {
         mode = 0;
       } else if (str == "MANUAL") {

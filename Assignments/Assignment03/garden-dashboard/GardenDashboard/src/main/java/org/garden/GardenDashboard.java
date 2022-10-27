@@ -17,8 +17,10 @@ public class GardenDashboard {
 
     private static int luminosity;
     private static int temperature;
-    private static boolean onOffLights;
-    private static int fadeLights;
+    private static int led1;
+    private static int led2;
+    private static int led3;
+    private static int led4;
     private static int irrigation;
     private static int mode;
     public static void main(String[] args) throws Exception {
@@ -54,17 +56,21 @@ public class GardenDashboard {
         List<String> items = Arrays.asList(line.split("\\s*,\\s*"));
         luminosity = Integer.parseInt(items.get(0));
         temperature = Integer.parseInt(items.get(1));
-        onOffLights = Boolean.parseBoolean(items.get(2));
-        fadeLights = Integer.parseInt(items.get(3));
-        irrigation = Integer.parseInt(items.get(4));
-        mode = Integer.parseInt(items.get(5));
+        led1 = Integer.parseInt(items.get(2));
+        led2 = Integer.parseInt(items.get(3));
+        led3 = Integer.parseInt(items.get(4));
+        led4 = Integer.parseInt(items.get(5));
+        irrigation = Integer.parseInt(items.get(6));
+        mode = Integer.parseInt(items.get(7));
     }
 
     private static void updateGUI() {
         gui.updateLuminosity(luminosity);
         gui.updateTemperature(temperature);
-        gui.updateOnOffLights(onOffLights);
-        gui.updateFadeLights(fadeLights);
+        gui.updateLed(led1, 1);
+        gui.updateLed(led2, 2);
+        gui.updateLed(led3, 3);
+        gui.updateLed(led4, 4);
         gui.updateIrrigation(irrigation);
         gui.updateMode(mode);
     }
