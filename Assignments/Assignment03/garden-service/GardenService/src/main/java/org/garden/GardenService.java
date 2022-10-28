@@ -127,12 +127,12 @@ public class GardenService {
                 if (luminosity < 5) {
                     led1 = 1;
                     led2 = 1;
-                    led3 = luminosity;
-                    led4 = luminosity;
+                    led3 = (5-luminosity);
+                    led4 = (5-luminosity);
                     controller.setLed(1, 1);
                     controller.setLed(1, 2);
-                    controller.setLed(luminosity, 3);
-                    controller.setLed(luminosity, 4);
+                    controller.setLed((5-luminosity), 3);
+                    controller.setLed((5-luminosity), 4);
                     if (luminosity < 2) {
                         if (sleepSecondsCounter == 0) {
                             keepIrrigating();

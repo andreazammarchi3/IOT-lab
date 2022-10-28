@@ -15,16 +15,6 @@ void MsgTask::init(int period) {
 }
 
 void MsgTask::tick() {
-  /*
-   if (MsgServiceBT.isMsgAvailable()) {
-      Msg* msg = MsgServiceBT.receiveMsg();
-      String strBT = msg->getContent();
-      if (strBT.indexOf("led1_") >= 0) {
-        String value = cutValueFromStr(strBT, "led1_");
-        led1 = value.toInt();
-        MsgService.sendMsg("led1_" + value);
-      } 
-      */
   if (mode == 2) {
     checkManual();
   } else if (mode == 0) {
@@ -54,6 +44,9 @@ void MsgTask::tick() {
         MsgService.sendMsg("irri_" + value);
       } else if (str == "ALARM") {
         mode = 2;
+        MsgService.sendMsg("ALARM");
+      } else if (str == "mode") {
+        MsgService.sendMsg(String(mode));
       }
     }
   } else if(mode == 1) {
@@ -70,6 +63,8 @@ void MsgTask::tick() {
         MsgService.sendMsg(String(led4));
       } else if (str == "irri") {
         MsgService.sendMsg(String(irrigation));
+      } else if (str == "mode") {
+        MsgService.sendMsg(String(mode));
       }
       delete msg;
     }
@@ -97,6 +92,9 @@ void MsgTask::tick() {
         String value = cutValueFromStr(str, "irri_");
         irrigation = value.toInt();
         MsgServiceBT.sendMsg("irri_" + value);
+      } else if (str == "MANUAL") {
+        mode = 1;
+        MsgServiceBT.sendMsg(str);
       }
       delete msg;
     }
