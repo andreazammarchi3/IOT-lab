@@ -15,6 +15,7 @@ class MsgTask: public Task {
 
   private:
     String cutValueFromStr(String str, String sub);
+    void checkManual();
 };
 
 #endif

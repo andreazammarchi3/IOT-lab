@@ -2,6 +2,7 @@ package com.example.smartgarden;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -166,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                 btChannel.registerListener(new EmulatedBluetoothChannel.Listener() {
                     @Override
                     public void onMessageReceived(String receivedMessage) {
-                        ((TextView) findViewById(R.id.outText)).setText("");
                         ((TextView) findViewById(R.id.outText)).append(String.format(
                                 "> [RECEIVED from %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
@@ -176,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onMessageSent(String sentMessage) {
-                        ((TextView) findViewById(R.id.outText)).setText("");
                         ((TextView) findViewById(R.id.outText)).append(String.format(
                                 "> [SENT to %s] %s\n",
                                 btChannel.getRemoteDeviceName(),
@@ -215,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.button_irrigation_minus).setOnClickListener(view -> decIrr());
         findViewById(R.id.button_irrigation_plus).setOnClickListener(view -> incIrr());
         findViewById(R.id.button_irrigation).setOnClickListener(view -> toggleIrr());
+        ((TextView) findViewById(R.id.outText)).setMovementMethod(new ScrollingMovementMethod());
 
         setEnabledAllBtns(false);
     }

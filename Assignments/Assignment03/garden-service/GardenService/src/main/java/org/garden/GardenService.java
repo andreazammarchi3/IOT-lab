@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Objects;
 
 public class GardenService {
     private static final int ACTIVITY_IRRIGATION_TIME = 4;
@@ -98,7 +97,7 @@ public class GardenService {
         temperature = agent.getTemperature();
     }
 
-    private static void keepIrrigating() {
+    private static void keepIrrigating() throws InterruptedException {
         irrigation = temperature;
         controller.setIrrigation(temperature);
         activitySecondsCounter++;
@@ -122,20 +121,18 @@ public class GardenService {
         getDataFromSensorboard();
         switch (mode) {
             case AUTO -> {
-                if (!Objects.equals(controller.getSerialData(), "empty")) {
-                    if (Objects.equals(controller.getSerialData(), "MANUAL")) {
-                        mode = Mode.MANUAL;
-                    }
+                if (controller.getMode() == Mode.MANUAL.getValue()) {
+                    mode = Mode.MANUAL;
                 }
                 if (luminosity < 5) {
                     led1 = 1;
                     led2 = 1;
                     led3 = luminosity;
                     led4 = luminosity;
-                    controller.setLed(1,1);
-                    controller.setLed(1,2);
-                    controller.setLed(luminosity,3);
-                    controller.setLed(luminosity,4);
+                    controller.setLed(1, 1);
+                    controller.setLed(1, 2);
+                    controller.setLed(luminosity, 3);
+                    controller.setLed(luminosity, 4);
                     if (luminosity < 2) {
                         if (sleepSecondsCounter == 0) {
                             keepIrrigating();
@@ -145,8 +142,7 @@ public class GardenService {
                     } else {
                         if (activitySecondsCounter != 0) {
                             keepIrrigating();
-                        }
-                        else if (sleepSecondsCounter != 0) {
+                        } else if (sleepSecondsCounter != 0) {
                             keepSleeping();
                         }
                     }
@@ -155,10 +151,10 @@ public class GardenService {
                     led2 = 0;
                     led3 = 0;
                     led4 = 0;
-                    controller.setLed(0,1);
-                    controller.setLed(0,2);
-                    controller.setLed(0,3);
-                    controller.setLed(0,4);
+                    controller.setLed(0, 1);
+                    controller.setLed(0, 2);
+                    controller.setLed(0, 3);
+                    controller.setLed(0, 4);
                 }
 
                 if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
@@ -170,29 +166,22 @@ public class GardenService {
                 }
             }
 
-            case MANUAL -> {
-                if (!Objects.equals(controller.getSerialData(), "empty")) {
-                    String msg = controller.getSerialData();
-                    if (msg.contains("led1_")) {
-                        led1 = Integer.parseInt(msg.replace("led1_", ""));
-                    } else if (msg.contains("led2_")) {
-                        led2 = Integer.parseInt(msg.replace("led2_", ""));
-                    } else if (msg.contains("led3_")) {
-                        led2 = Integer.parseInt(msg.replace("led3_", ""));
-                    } else if (msg.contains("led4_")) {
-                        led2 = Integer.parseInt(msg.replace("led4_", ""));
-                    } else if (msg.contains("irri_")) {
-                        led2 = Integer.parseInt(msg.replace("irri_", ""));
-                    }
-                }
-            }
+            case MANUAL -> getDataFromController();
 
             case ALARM -> {
-                if (Objects.equals(controller.getSerialData(), "MANUAL")) {
+                if (controller.getMode() == Mode.MANUAL.getValue()) {
                     mode = Mode.MANUAL;
                 }
             }
         }
+    }
+
+    public static void getDataFromController() throws Exception {
+        led1 = controller.getLed(1);
+        led2 = controller.getLed(2);
+        led3 = controller.getLed(3);
+        led4 = controller.getLed(4);
+        irrigation = controller.getIrrigation();
     }
 
     public static void close() {

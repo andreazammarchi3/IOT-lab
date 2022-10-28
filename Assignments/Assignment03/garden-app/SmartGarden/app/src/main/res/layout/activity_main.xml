@@ -275,10 +275,10 @@
 
             <TextView
                 android:id="@+id/outText"
-                android:layout_width="245dp"
-                android:layout_height="126dp"
+                android:layout_width="379dp"
+                android:layout_height="185dp"
+                android:gravity="bottom"
                 android:text="@string/irrigation_counter"
-                android:textAlignment="center"
                 android:textSize="20sp" />
 
             <Button

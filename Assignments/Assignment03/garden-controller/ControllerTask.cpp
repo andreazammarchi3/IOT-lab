@@ -122,7 +122,7 @@ void ControllerTask::tick() {
 
 void ControllerTask::setFadeLight(int value, int periodCounter, int led) {
   if (value != 0) {
-    int dc = periodCounter % (value);
+    int dc = periodCounter % (value * 5);
     if (dc == 0) {
       digitalWrite(led, HIGH);
     } else {
