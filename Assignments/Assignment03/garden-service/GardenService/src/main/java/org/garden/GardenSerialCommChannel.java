@@ -19,7 +19,7 @@ public class GardenSerialCommChannel {
 
     public void sendSerialData(String inputMsg) throws InterruptedException {
         channel.sendMsg(inputMsg);
-        channel.receiveMsg();
+        System.out.println(channel.receiveMsg());
     }
 
     public String getSerialData() throws InterruptedException {

@@ -46,7 +46,7 @@ void MsgTask::tick() {
         mode = 2;
         MsgService.sendMsg("ALARM");
       } else if (str == "mode") {
-        MsgService.sendMsg(String(mode));
+        MsgService.sendMsg("mode_" + String(mode));
       }
     }
   } else if(mode == 1) {

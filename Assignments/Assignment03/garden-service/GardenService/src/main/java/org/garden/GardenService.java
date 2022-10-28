@@ -84,7 +84,6 @@ public class GardenService {
                     mainTask();
                     line = reader.readLine();
                 }
-                close();
             } catch (Exception e) {
                 close();
             }
@@ -97,26 +96,6 @@ public class GardenService {
         temperature = agent.getTemperature();
     }
 
-    private static void keepIrrigating() throws InterruptedException {
-        irrigation = temperature;
-        controller.setIrrigation(temperature);
-        activitySecondsCounter++;
-        if (activitySecondsCounter == ACTIVITY_IRRIGATION_TIME) {
-            activitySecondsCounter = 0;
-            sleepSecondsCounter++;
-            irrigation = 0;
-            controller.setIrrigation(0);
-            keepSleeping();
-        }
-    }
-
-    private static void keepSleeping() {
-        sleepSecondsCounter++;
-        if (sleepSecondsCounter == SLEEP_IRRIGATION_TIME) {
-            sleepSecondsCounter = 0;
-        }
-    }
-
     private static void mainTask() throws Exception {
         getDataFromSensorboard();
         switch (mode) {
@@ -124,6 +103,7 @@ public class GardenService {
                 if (controller.getMode() == Mode.MANUAL.getValue()) {
                     mode = Mode.MANUAL;
                 }
+
                 if (luminosity < 5) {
                     led1 = 1;
                     led2 = 1;
@@ -133,18 +113,13 @@ public class GardenService {
                     controller.setLed(1, 2);
                     controller.setLed((5-luminosity), 3);
                     controller.setLed((5-luminosity), 4);
+
                     if (luminosity < 2) {
-                        if (sleepSecondsCounter == 0) {
-                            keepIrrigating();
-                        } else {
-                            keepSleeping();
-                        }
+                        irrigation = temperature;
+                        controller.setIrrigation(irrigation);
                     } else {
-                        if (activitySecondsCounter != 0) {
-                            keepIrrigating();
-                        } else if (sleepSecondsCounter != 0) {
-                            keepSleeping();
-                        }
+                        irrigation = 0;
+                        controller.setIrrigation(irrigation);
                     }
                 } else {
                     led1 = 0;
@@ -155,14 +130,14 @@ public class GardenService {
                     controller.setLed(0, 2);
                     controller.setLed(0, 3);
                     controller.setLed(0, 4);
+                    irrigation = 0;
+                    controller.setIrrigation(irrigation);
                 }
 
                 if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
                     mode = Mode.ALARM;
                     controller.setMode(mode.getValue());
                     agent.setMode(Mode.ALARM.getValue());
-                } else {
-                    agent.setMode(Mode.AUTO.getValue());
                 }
             }
 
