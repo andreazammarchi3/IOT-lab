@@ -17,17 +17,11 @@ public class GardenSerialCommChannel {
         System.out.println("Ready.");
     }
 
-    public void sendSerialData(String inputMsg) throws InterruptedException {
+    public String sendSerialData(String inputMsg) throws InterruptedException {
         channel.sendMsg(inputMsg);
-        System.out.println(channel.receiveMsg());
-    }
-
-    public String getSerialData() throws InterruptedException {
-        if (channel.isMsgAvailable()) {
-            return channel.receiveMsg();
-        } else {
-            return "empty";
-        }
+        String msg = channel.receiveMsg();
+        //System.out.println(msg);
+        return msg;
     }
 
     public void setIrrigation(int value) throws InterruptedException {
@@ -47,8 +41,7 @@ public class GardenSerialCommChannel {
     }
 
     public int getIrrigation() throws Exception {
-        sendSerialData("irri");
-        String value = getSerialData();
+        String value = sendSerialData("irri");
         if (!Objects.equals(value, "empty")) {
             return Integer.parseInt(value);
         } else {
@@ -57,8 +50,7 @@ public class GardenSerialCommChannel {
     }
 
     public int getLed(int led) throws Exception {
-        sendSerialData("led" + led);
-        String value = getSerialData();
+        String value = sendSerialData("led" + led);
         if (!Objects.equals(value, "empty")) {
             return Integer.parseInt(value);
         } else {
@@ -67,13 +59,8 @@ public class GardenSerialCommChannel {
     }
 
     public int getMode() throws Exception {
-        sendSerialData("mode");
-        String value = getSerialData();
-        if (!Objects.equals(value, "empty")) {
-            return Integer.parseInt(value);
-        } else {
-            return -1;
-        }
+        String value = sendSerialData("mode");
+        return Integer.parseInt(value);
     }
 
     public void close() throws InterruptedException {

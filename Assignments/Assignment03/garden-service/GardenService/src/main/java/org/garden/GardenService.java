@@ -25,6 +25,7 @@ public class GardenService {
     private static Mode mode = Mode.AUTO;
     private static int activitySecondsCounter = 0;
     private static int sleepSecondsCounter = 0;
+    private static int periodCounter = 0;
 
     private enum Mode {
         AUTO(0),
@@ -96,42 +97,79 @@ public class GardenService {
         temperature = agent.getTemperature();
     }
 
+    private static void keepSleeping() {
+        sleepSecondsCounter++;
+        if (sleepSecondsCounter == SLEEP_IRRIGATION_TIME) {
+            sleepSecondsCounter = 0;
+        }
+    }
+
+    private static void keepIrrigating() throws InterruptedException {
+        if (irrigation != temperature) {
+            irrigation = temperature;
+            controller.setIrrigation(irrigation);
+        }
+        activitySecondsCounter++;
+        if (activitySecondsCounter == ACTIVITY_IRRIGATION_TIME) {
+            activitySecondsCounter = 0;
+            sleepSecondsCounter++;
+            irrigation = 0;
+            controller.setIrrigation(0);
+            keepSleeping();
+        }
+    }
+
     private static void mainTask() throws Exception {
         getDataFromSensorboard();
         switch (mode) {
             case AUTO -> {
-                if (controller.getMode() == Mode.MANUAL.getValue()) {
-                    mode = Mode.MANUAL;
+                periodCounter++;
+                if (periodCounter == 4) {
+                    periodCounter = 0;
+                    if (controller.getMode() == Mode.MANUAL.getValue()) {
+                        mode = Mode.MANUAL;
+                    }
                 }
 
                 if (luminosity < 5) {
-                    led1 = 1;
-                    led2 = 1;
-                    led3 = (5-luminosity);
-                    led4 = (5-luminosity);
-                    controller.setLed(1, 1);
-                    controller.setLed(1, 2);
-                    controller.setLed((5-luminosity), 3);
-                    controller.setLed((5-luminosity), 4);
-
+                    if (led1 != 1) {
+                        led1 = 1;
+                        led2 = 1;
+                        controller.setLed(1, 1);
+                        controller.setLed(1, 2);
+                    }
+                    if (led3 != (5 - luminosity)) {
+                        led3 = (5 - luminosity);
+                        led4 = (5 - luminosity);
+                        controller.setLed((5-luminosity), 3);
+                        controller.setLed((5-luminosity), 4);
+                    }
                     if (luminosity < 2) {
-                        irrigation = temperature;
-                        controller.setIrrigation(irrigation);
+                        if (sleepSecondsCounter == 0) {
+                            keepIrrigating();
+                        } else {
+                            keepSleeping();
+                        }
                     } else {
+                        if (activitySecondsCounter != 0) {
+                            keepIrrigating();
+                        } else if (sleepSecondsCounter != 0) {
+                            keepSleeping();
+                        }
+                    }
+                } else {
+                    if (led1 != 0) {
+                        led1 = 0;
+                        led2 = 0;
+                        led3 = 0;
+                        led4 = 0;
+                        controller.setLed(0, 1);
+                        controller.setLed(0, 2);
+                        controller.setLed(0, 3);
+                        controller.setLed(0, 4);
                         irrigation = 0;
                         controller.setIrrigation(irrigation);
                     }
-                } else {
-                    led1 = 0;
-                    led2 = 0;
-                    led3 = 0;
-                    led4 = 0;
-                    controller.setLed(0, 1);
-                    controller.setLed(0, 2);
-                    controller.setLed(0, 3);
-                    controller.setLed(0, 4);
-                    irrigation = 0;
-                    controller.setIrrigation(irrigation);
                 }
 
                 if (temperature == 5 && (activitySecondsCounter == 0 || sleepSecondsCounter != 0)) {
