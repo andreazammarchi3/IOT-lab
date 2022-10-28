@@ -65,6 +65,14 @@ void ControllerTask::tick() {
 
     // MANUAL state: waiting for user input
     case MANUAL:
+      if (periodCounter == 0) {
+        digitalWrite(LED1_PIN, 0);
+        digitalWrite(LED2_PIN, 0);
+        digitalWrite(LED3_PIN, 0);
+        digitalWrite(LED4_PIN, 0);
+        servoPosition = 750;
+        servo.write(servoPosition);
+      }
       if (periodCounter % 100 == 0) {
         if (mode == 0) {
           state = AUTO;

@@ -3,8 +3,10 @@ package org.garden.channel;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.concurrent.*;
 import jssc.*;
+import org.garden.GardenService;
 
 /**
  * Comm channel implementation based on serial port.
@@ -171,6 +173,9 @@ public class ExtendedSerialCommChannel implements CommChannel, SerialPortEventLi
                 try {
                     out = new PrintWriter(socket.getOutputStream(), true);
                     out.println(msg);
+                    if (Objects.equals(msg, "MANUAL")) {
+                        GardenService.setModeToManual();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

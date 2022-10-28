@@ -123,6 +123,7 @@ public class GardenService {
         getDataFromSensorboard();
         switch (mode) {
             case AUTO -> {
+                /*
                 periodCounter++;
                 if (periodCounter == 4) {
                     periodCounter = 0;
@@ -130,6 +131,7 @@ public class GardenService {
                         mode = Mode.MANUAL;
                     }
                 }
+                */
 
                 if (luminosity < 5) {
                     if (led1 != 1) {
@@ -199,5 +201,9 @@ public class GardenService {
 
     public static void close() {
         System.exit(0);
+    }
+
+    public static void setModeToManual() {
+        mode = Mode.MANUAL;
     }
 }
