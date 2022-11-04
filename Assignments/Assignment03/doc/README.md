@@ -12,4 +12,5 @@
 #### Info
 The description of the system, the description of FSMs and the representation of the schemas/breadboards are included in the file *report.pdf*.
 
-#### Link video tutorial
+#### Link video tutorial (italian)
+https://drive.google.com/file/d/15cXm559zpn-ydGwtYyjFGJbQecZp7S2l/view?usp=sharing
