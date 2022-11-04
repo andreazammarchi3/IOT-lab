@@ -72,6 +72,11 @@ void ControllerTask::tick() {
         digitalWrite(LED4_PIN, 0);
         servoPosition = 750;
         servo.write(servoPosition);
+        led1 = 0;
+        led2 = 0;
+        led3 = 0;
+        led4 = 0;
+        irrigation = 0;
       }
       if (periodCounter % 100 == 0) {
         if (mode == 0) {

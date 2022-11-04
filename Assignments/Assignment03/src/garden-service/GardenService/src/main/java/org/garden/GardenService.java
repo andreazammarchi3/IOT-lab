@@ -67,22 +67,21 @@ public class GardenService {
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
                 String line = reader.readLine();
                 while (!line.isEmpty()) {
+                    mainTask();
                     // If dashboard is requesting data
                     if (line.equals("data")) {
-                        getDataFromSensorboard();
                         // Send data to dashboard
                         writer.println(
                                 luminosity + ", " +
-                                temperature + ", " +
-                                led1 + ", " +
-                                led2 + ", " +
-                                led3 + ", " +
-                                led4 + ", " +
-                                irrigation + ", " +
-                                mode.getValue()
+                                        temperature + ", " +
+                                        led1 + ", " +
+                                        led2 + ", " +
+                                        led3 + ", " +
+                                        led4 + ", " +
+                                        irrigation + ", " +
+                                        mode.getValue()
                         );
                     }
-                    mainTask();
                     line = reader.readLine();
                 }
             } catch (Exception e) {

@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed3() {
         if (led3Counter < 4) {
             led3Counter++;
-            sendMessage("led3_" + led3Counter);
+            sendMessage("3" + led3Counter);
         }
         ((TextView)findViewById(R.id.led_3_counter)).setText(String.valueOf(led3Counter));
     }
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private void incLed4() {
         if (led4Counter < 4) {
             led4Counter++;
-            sendMessage("led4_" + led4Counter);
+            sendMessage("4" + led4Counter);
         }
         ((TextView)findViewById(R.id.led_4_counter)).setText(String.valueOf(led4Counter));
     }
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private void incIrr() {
         if (irrCounter < 4) {
             irrCounter++;
-            sendMessage("irri_" + irrCounter);
+            sendMessage("5" + irrCounter);
             irrMode = true;
         }
         ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed3() {
         if (led3Counter > 0) {
             led3Counter--;
-            sendMessage("led3_" + led3Counter);
+            sendMessage("3" + led3Counter);
         }
         ((TextView)findViewById(R.id.led_3_counter)).setText(String.valueOf(led3Counter));
     }
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private void decLed4() {
         if (led4Counter > 0) {
             led4Counter--;
-            sendMessage("led4_" + led4Counter);
+            sendMessage("4" + led4Counter);
         }
         ((TextView)findViewById(R.id.led_4_counter)).setText(String.valueOf(led4Counter));
     }
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private void decIrr() {
         if (irrCounter > 1) {
             irrCounter--;
-            sendMessage("irri_" + irrCounter);
+            sendMessage("5" + irrCounter);
             irrMode = true;
         }
         ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
@@ -127,32 +127,32 @@ public class MainActivity extends AppCompatActivity {
     private void toggleLed1() {
         if (led1Bool) {
             led1Bool = false;
-            sendMessage("led1_0");
+            sendMessage("10");
         } else {
             led1Bool = true;
-            sendMessage("led1_1");
+            sendMessage("11");
         }
     }
 
     private void toggleLed2() {
         if (led2Bool) {
             led2Bool = false;
-            sendMessage("led2_0");
+            sendMessage("20");
         } else {
             led2Bool = true;
-            sendMessage("led2_1");
+            sendMessage("21");
         }
     }
 
     private void toggleIrr() {
         if (irrMode) {
             irrMode = false;
-            sendMessage("irri_0");
+            sendMessage("50");
             irrCounter = 0;
             ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
         } else {
             irrMode = true;
-            sendMessage("irri_1");
+            sendMessage("51");
             irrCounter = 1;
             ((TextView)findViewById(R.id.irrigation_counter)).setText(String.valueOf(irrCounter));
         }

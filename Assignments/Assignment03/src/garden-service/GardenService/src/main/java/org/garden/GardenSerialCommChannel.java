@@ -11,25 +11,26 @@ public class GardenSerialCommChannel {
     private final ExtendedSerialCommChannel channel;
 
     public GardenSerialCommChannel() throws Exception {
-        channel = new ExtendedSerialCommChannel("/dev/cu.usbmodem14201", 9600, 8080);
+        channel = new ExtendedSerialCommChannel("/dev/cu.usbmodem14201", 9600, 880);
         System.out.println("Waiting Arduino for rebooting...");
         Thread.sleep(2000);
         System.out.println("Ready.");
     }
 
     public String sendSerialData(String inputMsg) throws InterruptedException {
-       channel.sendMsg(inputMsg);
+        channel.sendMsg(inputMsg);
+        System.out.println("Sent: " + inputMsg);
         String msg = channel.receiveMsg();
-        System.out.println(msg);
+        System.out.println("Received: " + msg);
         return msg;
     }
 
     public void setIrrigation(int value) throws InterruptedException {
-        sendSerialData("irri_" + value);
+        sendSerialData("5" + value);
     }
 
     public void setLed(int value, int led) throws InterruptedException {
-        sendSerialData("led" + led + "_" + value);
+        sendSerialData(String.valueOf(led) + String.valueOf(value));
     }
 
     public void setMode(int value) throws InterruptedException {

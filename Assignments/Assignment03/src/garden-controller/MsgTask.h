@@ -14,8 +14,7 @@ class MsgTask: public Task {
     void tick();
 
   private:
-    String cutValueFromStr(String str, String sub);
-    void checkManual();
+    void cutValueFromStr(String str);
 };
 
 #endif

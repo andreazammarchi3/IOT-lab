@@ -54,31 +54,28 @@ public final class EmulatedBluetoothChannel extends BluetoothChannel {
         }
 
         public void run() {
+            DataInputStream input = new DataInputStream(inputStream);
+
+            StringBuilder readbuffer = new StringBuilder();
+
+            byte inputByte;
             while (true) {
                 try {
-                    DataInputStream input = new DataInputStream(inputStream);
+                    while (input.available() > 0 && (inputByte = input.readByte()) != 0) {
+                        char chr = (char) inputByte;
+                        if(chr != C.message.MESSAGE_TERMINATOR){
+                            readbuffer.append(chr);
+                        } else {
+                            String inputString = readbuffer.toString();
+                            Message receivedMessage = getBTChannelHandler().obtainMessage(
+                                    C.channel.MESSAGE_RECEIVED,
+                                    inputString.getBytes().length,
+                                    -1,
+                                    inputString.getBytes()
+                            );
+                            receivedMessage.sendToTarget();
 
-                    StringBuilder readbuffer = new StringBuilder();
-
-                    byte inputByte;
-
-                    while (input.available() > 0) {
-                        if ((inputByte = input.readByte()) != 0) {
-                            char chr = (char) inputByte;
-                            if(chr != C.message.MESSAGE_TERMINATOR){
-                                readbuffer.append(chr);
-                            } else {
-                                String inputString = readbuffer.toString();
-                                Message receivedMessage = getBTChannelHandler().obtainMessage(
-                                        C.channel.MESSAGE_RECEIVED,
-                                        inputString.getBytes().length,
-                                        -1,
-                                        inputString.getBytes()
-                                );
-                                receivedMessage.sendToTarget();
-
-                                readbuffer = new StringBuilder();
-                            }
+                            readbuffer = new StringBuilder();
                         }
                     }
                 }
