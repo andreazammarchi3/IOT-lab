@@ -17,8 +17,7 @@ void MsgTask::init(int period) {
 void MsgTask::tick() {
   if (mode == 2) {
     checkManual();
-  } else if (mode == 0) {
-    checkManual();
+  } else {
     if (MsgService.isMsgAvailable()) {
       Msg* msg = MsgService.receiveMsg();
       String str = msg->getContent();
@@ -46,14 +45,8 @@ void MsgTask::tick() {
         mode = 2;
         MsgService.sendMsg("ALARM");
       } else if (str == "mode") {
-        MsgService.sendMsg("mode_" + String(mode));
-      }
-    }
-  } else if(mode == 1) {
-    if (MsgService.isMsgAvailable()) {
-      Msg* msg = MsgService.receiveMsg();
-      String str = msg->getContent();
-      if (str == "led1") {
+        MsgService.sendMsg(String(mode));
+      } else if (str == "led1") {
         MsgService.sendMsg(String(led1));
       } else if (str == "led2") {
         MsgService.sendMsg(String(led2));
@@ -63,8 +56,6 @@ void MsgTask::tick() {
         MsgService.sendMsg(String(led4));
       } else if (str == "irri") {
         MsgService.sendMsg(String(irrigation));
-      } else if (str == "mode") {
-        MsgService.sendMsg(String(mode));
       }
       delete msg;
     }

@@ -2,6 +2,7 @@ package com.example.smartgarden;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -183,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
                         ));
                     }
                 });
-                sendMessage("MANUAL");
             }
 
             @Override
@@ -202,8 +202,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void initUI() {
         findViewById(R.id.button_require_manual_control).setOnClickListener(l -> {
-            findViewById(R.id.button_require_manual_control).setEnabled(false);
             connectToBTServer();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Do something after 3s
+                    sendMessage("MANUAL");
+                    findViewById(R.id.button_require_manual_control).setEnabled(false);
+                }
+            }, 3000);
         });
         findViewById(R.id.button_led_1).setOnClickListener(view -> toggleLed1());
         findViewById(R.id.button_led_2).setOnClickListener(view -> toggleLed2());
