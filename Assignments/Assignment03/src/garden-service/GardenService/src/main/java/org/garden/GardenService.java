@@ -190,7 +190,7 @@ public class GardenService {
         System.out.println(str);
         if (!Objects.equals(str, "empty")) {
             if (mode == Mode.MANUAL) {
-                if (!Objects.equals(str, "MANUAL")) {
+                if (Integer.parseInt(str) != Mode.MANUAL.value) {
                     int value = Integer.parseInt(str);
                     int ones = value % 10;
                     int tens = (value / 10) % 10;
@@ -203,8 +203,13 @@ public class GardenService {
                     }
                 }
             } else {
-                if (Objects.equals(str, "MANUAL")) {
+                if (Integer.parseInt(str) == Mode.MANUAL.value) {
                     mode = Mode.MANUAL;
+                    led1 = 0;
+                    led2 = 0;
+                    led3 = 0;
+                    led4 = 0;
+                    irrigation = 0;
                 }
             }
         }

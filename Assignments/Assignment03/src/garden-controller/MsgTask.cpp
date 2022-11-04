@@ -21,8 +21,8 @@ void MsgTask::tick() {
       String str = msg->getContent();
       if (str == "MANUAL") {
         mode = 1;
-        MsgServiceBT.sendMsg(str);
-        MsgService.sendMsg(str);
+        MsgServiceBT.sendMsg(sString(mode)tr);
+        MsgService.sendMsg(String(mode));
       }
       delete msg;
     }
