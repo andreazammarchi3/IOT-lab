@@ -68,4 +68,17 @@ public class GardenSerialCommChannel {
         sendSerialData("CLOSE");
         channel.close();
     }
+
+    public String getDataFromController() {
+        if (channel.isMsgAvailable()) {
+            try {
+                return channel.receiveMsg();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        } else {
+            return "empty";
+        }
+    }
 }

@@ -22,6 +22,7 @@ void MsgTask::tick() {
       if (str == "MANUAL") {
         mode = 1;
         MsgServiceBT.sendMsg(str);
+        MsgService.sendMsg(str);
       }
       delete msg;
     }
@@ -31,19 +32,7 @@ void MsgTask::tick() {
       String str = msg->getContent();
       if (str == "ALARM") {
         mode = 2;
-        MsgService.sendMsg("ALARM");
-      } else if (str == "mode") {
-        MsgService.sendMsg(String(mode));
-      } else if (str == "led1") {
-        MsgService.sendMsg(String(led1));
-      } else if (str == "led2") {
-        MsgService.sendMsg(String(led2));
-      } else if (str == "led3") {
-        MsgService.sendMsg(String(led3));
-      } else if (str == "led4") {
-        MsgService.sendMsg(String(led4));
-      } else if (str == "irri") {
-        MsgService.sendMsg(String(irrigation));
+        MsgService.sendMsg("2");
       } else {
         cutValueFromStr(str);
         MsgService.sendMsg(str);
@@ -56,10 +45,12 @@ void MsgTask::tick() {
       String str = msg->getContent();
       if (str == "MANUAL") {
         mode = 1;
-        MsgServiceBT.sendMsg(str);
+        MsgServiceBT.sendMsg(String(mode));
+        MsgService.sendMsg(String(mode));
       } else {
         cutValueFromStr(str);
         MsgServiceBT.sendMsg(str);
+        MsgService.sendMsg(str);
       }
       delete msg;
     }
@@ -68,8 +59,8 @@ void MsgTask::tick() {
 
 void MsgTask::cutValueFromStr(String str) {
   int value = str.toInt();
-  int ones = value%10;
-  int tens = (value/10)%10;
+  int ones = value % 10;
+  int tens = (value / 10) % 10;
   switch (tens) {
     case 1:
       led1 = ones;

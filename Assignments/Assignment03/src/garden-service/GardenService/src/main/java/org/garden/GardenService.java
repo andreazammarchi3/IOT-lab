@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 public class GardenService {
     private static final int ACTIVITY_IRRIGATION_TIME = 4;
@@ -120,18 +121,9 @@ public class GardenService {
 
     private static void mainTask() throws Exception {
         getDataFromSensorboard();
+        getDataFromController();
         switch (mode) {
             case AUTO -> {
-
-                periodCounter++;
-                if (periodCounter == 4) {
-                    periodCounter = 0;
-                    if (controller.getMode() == Mode.MANUAL.getValue()) {
-                        mode = Mode.MANUAL;
-                    }
-                }
-
-
                 if (luminosity < 5) {
                     if (led1 != 1) {
                         led1 = 1;
@@ -181,14 +173,8 @@ public class GardenService {
             }
 
             case MANUAL -> {
-                periodCounter++;
-                if (periodCounter == 4) {
-                    periodCounter = 0;
-                    if (controller.getMode() == Mode.MANUAL.getValue()) {
-                        getDataFromSensorboard();
-                        getDataFromController();
-                    }
-                }
+                getDataFromSensorboard();
+                getDataFromController();
             }
 
             case ALARM -> {
@@ -200,11 +186,28 @@ public class GardenService {
     }
 
     public static void getDataFromController() throws Exception {
-        led1 = controller.getLed(1);
-        led2 = controller.getLed(2);
-        led3 = controller.getLed(3);
-        led4 = controller.getLed(4);
-        irrigation = controller.getIrrigation();
+        String str = controller.getDataFromController();
+        System.out.println(str);
+        if (!Objects.equals(str, "empty")) {
+            if (mode == Mode.MANUAL) {
+                if (!Objects.equals(str, "MANUAL")) {
+                    int value = Integer.parseInt(str);
+                    int ones = value % 10;
+                    int tens = (value / 10) % 10;
+                    switch (tens) {
+                        case 1 -> led1 = ones;
+                        case 2 -> led2 = ones;
+                        case 3 -> led3 = ones;
+                        case 4 -> led4 = ones;
+                        case 5 -> irrigation = ones;
+                    }
+                }
+            } else {
+                if (Objects.equals(str, "MANUAL")) {
+                    mode = Mode.MANUAL;
+                }
+            }
+        }
     }
 
     public static void close() {
